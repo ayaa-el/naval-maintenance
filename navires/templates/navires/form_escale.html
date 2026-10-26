@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titre %}Nouvelle escale{% endblock %}
+
+{% block contenu %}
+<div class="card shadow-sm col-md-6 mx-auto mt-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Ajouter une escale pour {{ navire.nom_navire }}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-flex justify-content-end mt-4">
+                <a href="{% url 'navires:liste_navires' %}" class="btn btn-secondary me-2">Annuler</a>
+                <button type="submit" class="btn btn-success">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

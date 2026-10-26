@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block titre_page %}Nouvelle Fiche Navire{% endblock %}
+
+{% block contenu %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="premium-card mt-4">
+      <div class="card-header bg-white border-bottom-0 py-3">
+        <h5 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-file-medical text-ocean me-2"></i> Créer Fiche d'Intervention - Navire</h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info border-0 bg-info bg-opacity-10 text-info-emphasis mb-4">
+          <i class="fa-solid fa-circle-info me-2"></i> Décrivez brièvement le problème constaté sur le navire. Cette fiche sera envoyée à Haddoun pour un diagnostic précis.
+        </div>
+
+        <form method="post" class="needs-validation" novalidate>
+          {% csrf_token %}
+          
+          {% for field in form %}
+          <div class="mb-3">
+              <label for="{{ field.id_for_label }}" class="form-label fw-semibold text-dark">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}
+              <div class="form-text text-muted small">{{ field.help_text }}</div>
+              {% endif %}
+              {% for error in field.errors %}
+              <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
+          </div>
+          {% endfor %}
+          
+          <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+            <a href="{% url 'conventionnement:liste_fiches' %}" class="btn btn-outline-secondary">Annuler</a>
+            <button type="submit" class="btn btn-primary-maritime">
+              <i class="fa-solid fa-save me-1"></i> Créer la Fiche
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block titre %}Validation de l'Ordre de Travail {{ ordre.numero_ordre }}{% endblock %}
+
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="section-title text-dark">
+      <i class="fa-solid fa-stamp text-ocean me-2"></i> Examen & Validation de l'Ordre de Travail
+    </h3>
+    <p class="text-muted mb-0">Rôle requis : <strong>Superviseur ANP</strong> · Document : <span class="fw-bold text-primary">{{ ordre.numero_ordre }}</span></p>
+  </div>
+  <a href="{% url 'conventionnement:detail_ordre' ordre.id %}" class="btn btn-outline-secondary">
+    <i class="fa-solid fa-arrow-left me-1"></i> Retour à l'OT
+  </a>
+</div>
+
+<div class="row g-4">
+  <!-- Colonne Gauche : Récapitulatif de l'OT -->
+  <div class="col-lg-7">
+    <div class="premium-card mb-4">
+      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">
+          <i class="fa-solid fa-clipboard-check text-primary me-2"></i> Contenu de l'Ordre de Travail
+        </h5>
+        <span class="badge bg-warning text-dark">{{ ordre.get_status_display }}</span>
+      </div>
+      <div class="card-body">
+        <dl class="row mb-3 pb-3 border-bottom">
+          <dt class="col-sm-4 text-muted">N° Ordre</dt>
+          <dd class="col-sm-8 fw-bold text-primary">{{ ordre.numero_ordre }}</dd>
+          <dt class="col-sm-4 text-muted">Fiche Liée</dt>
+          <dd class="col-sm-8">
+            <a href="{% url 'conventionnement:detail_fiche' ordre.fiche_intervention.id %}">{{ ordre.fiche_intervention.numero_fiche }}</a>
+          </dd>
+          <dt class="col-sm-4 text-muted">Cible</dt>
+          <dd class="col-sm-8 fw-bold text-dark">{{ ordre.fiche_intervention.cible_label }}</dd>
+          <dt class="col-sm-4 text-muted">Créé par</dt>
+          <dd class="col-sm-8">{{ ordre.cree_par|default:"Superviseur Haddoun" }} ({{ ordre.date_creation|date:"d/m/Y" }})</dd>
+          <dt class="col-sm-4 text-muted">Diagnostic Haddoun</dt>
+          <dd class="col-sm-8 text-secondary">{{ ordre.fiche_intervention.precision_probleme|default:"Non renseigné" }}</dd>
+        </dl>
+
+        <!-- Tableau des prestations prévues -->
+        <h6 class="fw-bold text-dark mb-2"><i class="fa-solid fa-list-ul text-muted me-1"></i> Prestations / Travaux demandés :</h6>
+        <div class="table-responsive border rounded mb-3">
+          <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 10%;">#</th>
+                <th style="width: 65%;">Désignation</th>
+                <th class="text-center" style="width: 25%;">Quantité / Heures</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ligne in ordre.lignes.all %}
+              <tr>
+                <td class="text-muted">{{ forloop.counter }}</td>
+                <td class="fw-semibold">{{ ligne.description }}</td>
+                <td class="text-center">{{ ligne.quantite }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3" class="text-center text-muted py-2">Aucune ligne spécifiée.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="alert alert-info border-0 py-2 px-3 small d-flex align-items-center gap-2">
+          <i class="fa-solid fa-info-circle fa-lg"></i>
+          <div>
+            La validation de cet Ordre de Travail donnera l'autorisation formelle à l'équipe technique HADDOUN de débuter l'intervention.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colonne Droite : Décision du Superviseur ANP -->
+  <div class="col-lg-5">
+    <div class="premium-card">
+      <div class="card-header bg-white py-3 border-bottom">
+        <h5 class="fw-bold mb-0 text-dark">
+          <i class="fa-solid fa-gavel text-ocean me-2"></i> Décision Officielle ANP
+        </h5>
+      </div>
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">{{ form.status.label }}</label>
+            <div class="d-grid gap-2">
+              {% for radio in form.status %}
+              <label class="border rounded p-3 d-flex align-items-center gap-3 cursor-pointer bg-light hover-shadow">
+                {{ radio.tag }}
+                <div>
+                  <span class="fw-bold">{{ radio.choice_label }}</span>
+                </div>
+              </label>
+              {% endfor %}
+            </div>
+            {% if form.status.errors %}
+            <div class="text-danger small mt-1">{{ form.status.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold" for="{{ form.refuse_commentaire.id_for_label }}">
+              {{ form.refuse_commentaire.label }}
+            </label>
+            {{ form.refuse_commentaire }}
+            {% if form.refuse_commentaire.errors %}
+            <div class="text-danger small mt-1">{{ form.refuse_commentaire.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="d-grid gap-2 pt-2">
+            <button type="submit" class="btn btn-primary-maritime py-2 fw-semibold">
+              <i class="fa-solid fa-check-circle me-1"></i> Enregistrer la Décision
+            </button>
+            <a href="{% url 'conventionnement:detail_ordre' ordre.id %}" class="btn btn-outline-secondary py-2">
+              Annuler
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

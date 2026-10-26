@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block titre %}Tableau de Bord Haddoun — Chantier Naval & Escales{% endblock %}
+
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="section-title"><i class="fa-solid fa-ship text-navy"></i> Espace Haddoun — Chantier Naval & Reparations</h3>
+        <p class="text-muted mb-0">Gestion des escales, travaux sur navires et interventions techniques.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'navires:liste_navires' %}" class="btn btn-maritime-outline shadow-sm">
+            <i class="fa-solid fa-anchor me-1"></i> Voir les Navires
+        </a>
+        <a href="{% url 'conventionnement:liste_fiches' %}" class="btn btn-maritime-primary shadow-sm">
+            <i class="fa-solid fa-list-check me-1"></i> Suivi des Dossiers
+        </a>
+    </div>
+</div>
+
+<!-- KPI Cards Grid -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4 col-sm-6">
+        <div class="card card-kpi p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold">Total Navires Enregistrés</div>
+                    <div class="h3 fw-bold mb-0 text-dark">{{ total_navires }}</div>
+                </div>
+                <div class="kpi-icon kpi-icon-ocean">
+                    <i class="fa-solid fa-ship"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="card card-kpi p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold">Navires en Escale (Actifs)</div>
+                    <div class="h3 fw-bold mb-0 text-primary">{{ navires_en_escale }}</div>
+                </div>
+                <div class="kpi-icon kpi-icon-ocean">
+                    <i class="fa-solid fa-water"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6">
+        <div class="card card-kpi p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold">Fiches Intervention Navire</div>
+                    <div class="h3 fw-bold mb-0 text-info">{{ total_fiches_navires }}</div>
+                </div>
+                <div class="kpi-icon kpi-icon-ocean">
+                    <i class="fa-solid fa-file-signature"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Work Orders Pipeline -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-3 bg-white border-start border-4 border-warning">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small font-monospace">ORDRES DE TRAVAIL</span>
+                    <h5 class="fw-bold mb-0 mt-1">OT à Traiter / Valider</h5>
+                </div>
+                <span class="badge bg-warning text-dark fs-5 px-3 py-2 rounded-pill">{{ ot_a_traiter }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-3 bg-white border-start border-4 border-info">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small font-monospace">INTERVENTIONS</span>
+                    <h5 class="fw-bold mb-0 mt-1">OT en Cours de Réalisation</h5>
+                </div>
+                <span class="badge bg-info fs-5 px-3 py-2 rounded-pill">{{ ot_en_cours }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-3 bg-white border-start border-4 border-success">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small font-monospace">CLÔTURE</span>
+                    <h5 class="fw-bold mb-0 mt-1">OT Terminés</h5>
+                </div>
+                <span class="badge bg-success fs-5 px-3 py-2 rounded-pill">{{ ot_termines }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tables Section -->
+<div class="row g-4">
+    <!-- Active Escales -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-anchor text-primary me-2"></i> Navires en Escale (Chantier)</h5>
+                <a href="{% url 'navires:liste_navires' %}" class="small text-decoration-none">Voir tout</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Navire</th>
+                            <th>Ouvrage</th>
+                            <th>Date d'entrée</th>
+                            <th>Statut Facture</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for escale in escales_list %}
+                        <tr>
+                            <td class="fw-bold text-dark"><i class="fa-solid fa-ship me-1 text-muted"></i> {{ escale.navire.nom_navire }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ escale.ouvrage.nom_ouvrage }}</span></td>
+                            <td class="small text-muted">{{ escale.date_entree|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if escale.statut_facture == 'PAYE' %}
+                                    <span class="badge bg-success">Payé</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Non Payé</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">Aucune escale active en ce moment.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Navires Fiches -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-clipboard-list text-primary me-2"></i> Fiches Interventions Navire</h5>
+                <a href="{% url 'conventionnement:liste_fiches' %}" class="small text-decoration-none">Voir tout</a>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for fiche in recent_fiches_navires %}
+                <a href="{% url 'conventionnement:detail_fiche' fiche.id %}" class="list-group-item list-group-item-action p-3">
+                    <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                        <span class="fw-bold text-dark">{{ fiche.numero_fiche }}</span>
+                        <small class="text-muted"><i class="fa-regular fa-calendar me-1"></i> {{ fiche.date_creation|date:"d/m/Y" }}</small>
+                    </div>
+                    <p class="mb-1 text-primary fw-semibold small"><i class="fa-solid fa-ship me-1"></i> Navire: {{ fiche.escale.navire.nom_navire }}</p>
+                    <small class="text-muted d-block text-truncate">{{ fiche.description_probleme }}</small>
+                </a>
+                {% empty %}
+                <div class="p-4 text-center text-muted">Aucune fiche navire récente.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

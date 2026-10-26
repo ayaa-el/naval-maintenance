@@ -1,0 +1,284 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordre de Travail - {{ ordre.numero_ordre }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 13px;
+        }
+        .print-container {
+            max-width: 850px;
+            margin: 25px auto;
+            background: #ffffff;
+            padding: 35px 45px;
+            border-radius: 6px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e0;
+        }
+        .header-box {
+            border-bottom: 2px solid #003366;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .logo-anp {
+            max-height: 70px;
+            width: auto;
+            object-fit: contain;
+        }
+        .doc-title {
+            color: #003366;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+        .doc-number {
+            color: #d49b10;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .section-header {
+            background-color: #003366;
+            color: #ffffff;
+            padding: 6px 12px;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            border-radius: 3px;
+        }
+        .info-table th {
+            width: 30%;
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 600;
+            padding: 7px 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .info-table td {
+            padding: 7px 12px;
+            border: 1px solid #e2e8f0;
+            background-color: #ffffff;
+        }
+        .data-table thead th {
+            background-color: #f1f5f9;
+            color: #003366;
+            font-weight: 700;
+            border: 1px solid #cbd5e1;
+            padding: 8px 10px;
+        }
+        .data-table tbody td {
+            border: 1px solid #e2e8f0;
+            padding: 8px 10px;
+        }
+        .sign-box {
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            height: 120px;
+            padding: 10px;
+            position: relative;
+            background-color: #f8fafc;
+        }
+        .sign-title {
+            font-weight: bold;
+            color: #1e293b;
+            font-size: 12px;
+            text-transform: uppercase;
+            border-bottom: 1px dashed #cbd5e1;
+            padding-bottom: 4px;
+        }
+        .footer-note {
+            font-size: 10px;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
+            margin-top: 30px;
+        }
+        @media print {
+            body {
+                background: #ffffff !important;
+                font-size: 12px;
+            }
+            .print-container {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Barre d'action supérieure (masquée lors de l'impression) -->
+<div class="no-print bg-dark text-white py-2 px-4 shadow-sm mb-3">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fa-solid fa-clipboard-list text-warning me-2"></i>
+            <span class="fw-bold">Impression Ordre de Travail : {{ ordre.numero_ordre }}</span>
+        </div>
+        <div class="d-flex gap-2">
+            <button onclick="window.print()" class="btn btn-warning btn-sm fw-bold">
+                <i class="fa-solid fa-print me-1"></i> Imprimer ce document
+            </button>
+            <a href="{% url 'conventionnement:detail_ordre' ordre.id %}" class="btn btn-outline-light btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Retour à l'Ordre
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="print-container">
+    <!-- En-tête Officiel -->
+    <div class="header-box">
+        <div class="row align-items-center">
+            <div class="col-7 d-flex align-items-center gap-3">
+                <img src="{% static 'img/logo_anp.png' %}" alt="Logo ANP" class="logo-anp">
+                <div>
+                    <div class="fw-bold text-uppercase" style="color: #003366; font-size: 11px;">Royaume du Maroc</div>
+                    <div class="fw-bold text-uppercase" style="color: #003366; font-size: 12px;">Agence Nationale des Ports (ANP)</div>
+                    <div class="text-muted small" style="font-size: 10px;">Division Maintenance & Réparations Navales</div>
+                </div>
+            </div>
+            <div class="col-5 text-end">
+                <div class="doc-title">Ordre de Travail (OT)</div>
+                <div class="doc-number">{{ ordre.numero_ordre }}</div>
+                <div class="text-muted small mt-1">
+                    <i class="fa-regular fa-clock me-1"></i> Édité le : <strong>{{ date_impression|date:"d/m/Y à H:i" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Références & Cible -->
+    <div class="section-header">1. Références Générales</div>
+    <table class="table info-table mb-0">
+        <tbody>
+            <tr>
+                <th>N° Ordre de Travail</th>
+                <td class="fw-bold text-primary">{{ ordre.numero_ordre }}</td>
+                <th>Date d'Émission</th>
+                <td>{{ ordre.date_creation|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+                <th>Fiche d'Intervention liée</th>
+                <td class="fw-bold">{{ fiche.numero_fiche }}</td>
+                <th>Statut Actuel</th>
+                <td>
+                    {% if ordre.status == "VALIDE" %}
+                        <span class="badge bg-success">Validé par l'ANP</span>
+                    {% elif ordre.status == "TERMINE" %}
+                        <span class="badge bg-primary">Travaux Terminés</span>
+                    {% elif ordre.status == "REFUSE" %}
+                        <span class="badge bg-danger">Refusé</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">{{ ordre.get_status_display }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Cible d'intervention</th>
+                <td class="fw-bold" colspan="3">
+                    {% if fiche.is_navire %}
+                        <i class="fa-solid fa-ship text-primary me-1"></i> Navire : {{ fiche.cible_label }} (Escale N° {{ fiche.escale.id }})
+                    {% else %}
+                        <i class="fa-solid fa-wrench text-secondary me-1"></i> Équipement : {{ fiche.cible_label }}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Établi par (Haddoun)</th>
+                <td>{{ ordre.cree_par.get_full_name|default:ordre.cree_par.username|default:"Superviseur Haddoun" }}</td>
+                <th>Validé par (ANP)</th>
+                <td>
+                    {% if ordre.valide_par %}
+                        {{ ordre.valide_par.get_full_name|default:ordre.valide_par.username }}
+                        {% if ordre.date_validation %}<span class="text-muted small">le {{ ordre.date_validation|date:"d/m/Y" }}</span>{% endif %}
+                    {% else %}
+                        <span class="text-muted fst-italic">En attente de visa ANP</span>
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Services et Prestations Prévus -->
+    <div class="section-header">2. Description des Prestations, Pièces & Travaux à Réaliser</div>
+    <table class="table data-table mb-0">
+        <thead>
+            <tr>
+                <th style="width: 5%;">#</th>
+                <th style="width: 65%;">Désignation des Travaux / Pièces</th>
+                <th class="text-center" style="width: 30%;">Quantité / Heures</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ligne in lignes %}
+            <tr>
+                <td class="text-muted">{{ forloop.counter }}</td>
+                <td class="fw-semibold">{{ ligne.description }}</td>
+                <td class="text-center">{{ ligne.quantite }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center text-muted py-3">Aucune ligne spécifiée pour cet ordre.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if ordre.refuse_commentaire %}
+    <!-- Motif de Refus si applicable -->
+    <div class="section-header bg-danger">Motif du Refus ANP</div>
+    <div class="p-3 border rounded bg-white text-danger">
+        {{ ordre.refuse_commentaire }}
+    </div>
+    {% endif %}
+
+    <!-- Signatures & Visas -->
+    <div class="section-header">3. Visas & Approbations Officielles</div>
+    <div class="row g-3">
+        <div class="col-6">
+            <div class="sign-box">
+                <div class="sign-title">Société HADDOUN IMGS (Émetteur)</div>
+                <div class="small text-muted mt-1">Visa & Cachet du Responsable Technique :</div>
+                <div class="text-end text-muted small position-absolute bottom-0 end-0 p-2">Date : .... / .... / 20....</div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="sign-box">
+                <div class="sign-title">Agence Nationale des Ports (Validation)</div>
+                <div class="small text-muted mt-1">
+                    Visa & Cachet du Superviseur ANP :
+                    {% if ordre.valide_par %}<br><strong class="text-success"><i class="fa-solid fa-check-circle me-1"></i> Validé par {{ ordre.valide_par.get_full_name|default:ordre.valide_par.username }}</strong>{% endif %}
+                </div>
+                <div class="text-end text-muted small position-absolute bottom-0 end-0 p-2">Date : {{ ordre.date_validation|date:"d/m/Y"|default:".... / .... / 20...." }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pied de page -->
+    <div class="footer-note text-center">
+        Plateforme Intégrée de Maintenance Portuaire et Navale — ANP / HADDOUN IMGS<br>
+        Document officiel généré le {{ date_impression|date:"d/m/Y à H:i:s" }} — Page 1/1
+    </div>
+</div>
+
+</body>
+</html>

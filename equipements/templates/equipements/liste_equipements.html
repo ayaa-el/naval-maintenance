@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block titre %}Équipements Portuaires{% endblock %}
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="section-title"><i class="fa-solid fa-screwdriver-wrench text-warning"></i> Équipements Portuaires</h3>
+    <p class="text-muted mb-0">Gestion du parc matériel : {{ equipements|length }} équipement(s) enregistré(s).</p>
+  </div>
+  {% if user.role == "SUPERVISEUR_ANP" or user.role == "DIRECTEUR" %}
+  <a href="{% url 'equipements:ajouter_equipement' %}" class="btn btn-maritime-primary shadow-sm">
+    <i class="fa-solid fa-plus me-1"></i> Ajouter un équipement
+  </a>
+  {% endif %}
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Référence</th>
+          <th>Nom</th>
+          <th>Type</th>
+          <th>Localisation</th>
+          <th>Statut</th>
+          {% if user.role == "SUPERVISEUR_ANP" or user.role == "DIRECTEUR" %}
+          <th class="text-end">Actions</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for eq in equipements %}
+        <tr>
+          <td class="fw-bold text-muted small">{{ eq.reference }}</td>
+          <td class="fw-semibold"><i class="fa-solid fa-gear me-1 text-muted"></i> {{ eq.nom }}</td>
+          <td>{{ eq.get_type_equipement_display }}</td>
+          <td class="small text-muted">{{ eq.localisation|default:"—" }}</td>
+          <td>
+            {% if eq.statut == "EN_SERVICE" %}
+              <span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i>En service</span>
+            {% elif eq.statut == "EN_REPARATION" %}
+              <span class="badge bg-warning text-dark"><i class="fa-solid fa-wrench me-1"></i>En réparation</span>
+            {% else %}
+              <span class="badge bg-danger"><i class="fa-solid fa-circle-xmark me-1"></i>Hors service</span>
+            {% endif %}
+          </td>
+          {% if user.role == "SUPERVISEUR_ANP" or user.role == "DIRECTEUR" %}
+          <td class="text-end">
+            <div class="d-inline-flex gap-1">
+              <a href="{% url 'equipements:modifier_equipement' eq.pk %}" class="btn btn-sm btn-outline-warning">
+                <i class="fa-solid fa-pen me-1"></i> Modifier
+              </a>
+              <a href="{% url 'equipements:supprimer_equipement' eq.pk %}" class="btn btn-sm btn-outline-danger">
+                <i class="fa-solid fa-trash me-1"></i> Supprimer
+              </a>
+            </div>
+          </td>
+          {% endif %}
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="text-center text-muted py-5">
+            <i class="fa-solid fa-screwdriver-wrench fa-2x mb-2 d-block opacity-50"></i>
+            Aucun équipement enregistré.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

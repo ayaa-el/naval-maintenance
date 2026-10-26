@@ -1,0 +1,23 @@
+{% extends "base.html" %} {% block titre %}Ajouter un diagnostic{% endblock %}
+{% block contenu %}
+<h4 class="text-muted mb-4">
+  Diagnostic technique de la fiche {{ fiche.numero_fiche }}
+</h4>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="card p-4 bg-white">
+    {{ form.non_field_errors }}
+    <div class="mb-3">
+      <label class="form-label">{{ form.precision_probleme.label }}</label>
+      {{ form.precision_probleme }} {{ form.precision_probleme.errors }}
+    </div>
+    <button class="btn btn-primary">Enregistrer</button>
+    <a
+      href="{% url 'conventionnement:detail_fiche' fiche.id %}"
+      class="btn btn-secondary ms-2"
+      >Retour</a
+    >
+  </div>
+</form>
+{% endblock %}

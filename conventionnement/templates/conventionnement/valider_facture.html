@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block titre %}Validation & Paiement Facture {{ facture.numero_facture }}{% endblock %}
+
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="section-title text-dark">
+      <i class="fa-solid fa-stamp text-success me-2"></i> Visa & Validation du Paiement de la Facture
+    </h3>
+    <p class="text-muted mb-0">Rôle requis : <strong>Superviseur ANP</strong> · Document : <span class="fw-bold text-success">{{ facture.numero_facture }}</span></p>
+  </div>
+  <a href="{% url 'conventionnement:detail_ordre' ordre.id %}" class="btn btn-outline-secondary">
+    <i class="fa-solid fa-arrow-left me-1"></i> Retour à l'OT
+  </a>
+</div>
+
+<div class="row g-4 justify-content-center">
+  <!-- Colonne Récapitulatif Financier -->
+  <div class="col-lg-7">
+    <div class="premium-card mb-4">
+      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">
+          <i class="fa-solid fa-file-invoice-dollar text-success me-2"></i> Récapitulatif de la Facture
+        </h5>
+        <span class="badge bg-warning text-dark">{{ facture.get_statut_display }}</span>
+      </div>
+      <div class="card-body">
+        <dl class="row mb-3 pb-3 border-bottom">
+          <dt class="col-sm-4 text-muted">N° Facture</dt>
+          <dd class="col-sm-8 fw-bold text-success fs-6">{{ facture.numero_facture }}</dd>
+
+          <dt class="col-sm-4 text-muted">Bon de Livraison lié</dt>
+          <dd class="col-sm-8 fw-semibold">{{ facture.bon_livraison.numero_bon }}</dd>
+
+          <dt class="col-sm-4 text-muted">Ordre de Travail</dt>
+          <dd class="col-sm-8">
+            <a href="{% url 'conventionnement:detail_ordre' ordre.id %}">{{ ordre.numero_ordre }}</a>
+          </dd>
+
+          <dt class="col-sm-4 text-muted">Fiche Intervention</dt>
+          <dd class="col-sm-8">
+            <a href="{% url 'conventionnement:detail_fiche' ordre.fiche_intervention.id %}">{{ ordre.fiche_intervention.numero_fiche }}</a>
+          </dd>
+
+          <dt class="col-sm-4 text-muted">Cible</dt>
+          <dd class="col-sm-8 fw-bold text-dark">{{ ordre.fiche_intervention.cible_label }}</dd>
+
+          <dt class="col-sm-4 text-muted">Date d'Émission</dt>
+          <dd class="col-sm-8">{{ facture.date_creation|date:"d/m/Y" }}</dd>
+
+          <dt class="col-sm-4 text-muted">Émetteur</dt>
+          <dd class="col-sm-8">Société HADDOUN IMGS</dd>
+        </dl>
+
+        <!-- Tableau des prestations facturées -->
+        <h6 class="fw-bold text-dark mb-2"><i class="fa-solid fa-receipt text-muted me-1"></i> Détail des Prestations Réalisées :</h6>
+        <div class="table-responsive border rounded mb-3">
+          <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Désignation</th>
+                <th class="text-center">Quantité</th>
+                <th class="text-end">Prix Unitaire</th>
+                <th class="text-end">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ligne in ordre.lignes.all %}
+              <tr>
+                <td>{{ ligne.description }}</td>
+                <td class="text-center">{{ ligne.quantite }}</td>
+                <td class="text-end text-muted">{{ ligne.prix_unitaire }} MAD</td>
+                <td class="text-end fw-bold">{{ ligne.montant }} MAD</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-2">Aucune prestation spécifiée.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+              <tr>
+                <td colspan="3" class="text-end fw-bold text-uppercase">Montant Net Total :</td>
+                <td class="text-end fw-bold text-success fs-5">{{ facture.montant_total }} MAD</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colonne Décision & Confirmation Visa -->
+  <div class="col-lg-5">
+    <div class="premium-card">
+      <div class="card-header bg-white py-3 border-bottom">
+        <h5 class="fw-bold mb-0 text-dark">
+          <i class="fa-solid fa-stamp text-ocean me-2"></i> Approbation du Paiement
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-warning d-flex gap-3 align-items-start mb-4 shadow-sm border-0">
+          <i class="fa-solid fa-triangle-exclamation fa-2x text-warning"></i>
+          <div class="small">
+            <strong>Attention :</strong> En confirmant cette validation, vous certifiez que les travaux ont été réceptionnés et validés conformément au Bon de Livraison, et vous ordonnez le règlement de la facture de <strong>{{ facture.montant_total }} MAD</strong>.
+          </div>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success btn-lg py-3 fw-bold shadow-sm">
+              <i class="fa-solid fa-check-circle me-2"></i> Confirmer & Valider le Paiement
+            </button>
+            <a href="{% url 'conventionnement:detail_ordre' ordre.id %}" class="btn btn-outline-secondary py-2">
+              Annuler
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

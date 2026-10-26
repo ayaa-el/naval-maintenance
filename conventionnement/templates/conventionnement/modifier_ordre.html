@@ -1,0 +1,24 @@
+{% extends "base.html" %} {% block titre %}Modifier Ordre de Travail{% endblock %} {% block contenu %}
+<h4 class="text-muted mb-4">Modifier l'ordre {{ ordre.numero_ordre }}</h4>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="card p-4 bg-white">
+    {{ form.non_field_errors }}
+    <div class="mb-3">
+      <label class="form-label">{{ form.montant_total.label }}</label>
+      {{ form.montant_total }} {{ form.montant_total.errors }}
+    </div>
+    <div class="mb-3">
+      <label class="form-label">{{ form.refuse_commentaire.label }}</label>
+      {{ form.refuse_commentaire }} {{ form.refuse_commentaire.errors }}
+    </div>
+    <button class="btn btn-primary">Enregistrer les modifications</button>
+    <a
+      href="{% url 'conventionnement:detail_ordre' ordre.id %}"
+      class="btn btn-secondary ms-2"
+      >Annuler</a
+    >
+  </div>
+</form>
+{% endblock %}

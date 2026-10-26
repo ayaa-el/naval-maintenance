@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block titre %}Créer l'Ordre de Travail{% endblock %}
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="section-title"><i class="fa-solid fa-clipboard-list text-primary"></i> Créer l'Ordre de Travail</h3>
+    <p class="text-muted">Fiche : <strong>{{ fiche.numero_fiche }}</strong> — {{ fiche.equipement }}</p>
+  </div>
+  <a href="{% url 'conventionnement:detail_fiche' fiche.id %}" class="btn btn-outline-secondary">
+    <i class="fa-solid fa-arrow-left me-1"></i>Retour
+  </a>
+</div>
+
+{% if fiche.precision_probleme %}
+<div class="alert alert-info mb-4">
+  <i class="fa-solid fa-stethoscope me-2"></i>
+  <strong>Diagnostic Haddoun :</strong> {{ fiche.precision_probleme }}
+</div>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+      <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-check text-primary me-2"></i> Lignes de Services / Tâches</h5>
+      <p class="text-muted small mb-0">Ajoutez chaque service ou tâche à réaliser. Pour chaque ligne, choisissez un service prédéfini ou saisissez une description libre.</p>
+    </div>
+    <div class="card-body">
+      {{ formset.management_form }}
+
+      <div id="formset-container">
+        {% for form in formset %}
+        <div class="ligne-form border rounded p-3 mb-3 bg-light">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small text-muted">Service prédéfini</label>
+              {{ form.description_predefined }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-muted">Description libre</label>
+              {{ form.description }}
+              {% for error in form.description.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-semibold small text-muted">{{ form.quantite.label }}</label>
+              {{ form.quantite }}
+            </div>
+            {% if form.instance.pk %}
+            <div class="col-12">
+              <label class="text-danger small">{{ form.DELETE.label }}: {{ form.DELETE }}</label>
+              {{ form.id }}
+            </div>
+            {% else %}
+            <div class="d-none">{{ form.id }}</div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="mt-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary btn-lg">
+          <i class="fa-solid fa-save me-2"></i>Créer l'Ordre de Travail
+        </button>
+        <a href="{% url 'conventionnement:detail_fiche' fiche.id %}" class="btn btn-outline-secondary btn-lg">Annuler</a>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+// Auto-remplissage du champ libre depuis le select prédéfini
+document.querySelectorAll('.ligne-predefined').forEach(function(select) {
+  select.addEventListener('change', function() {
+    if (this.value) {
+      var row = this.closest('.ligne-form');
+      var desc = row.querySelector('.ligne-description');
+      if (desc && !desc.value) { desc.value = this.value; }
+    }
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block titre %}Gestion RH — Employés & Intervenants{% endblock %}
+
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="section-title"><i class="fa-solid fa-users-gear text-primary"></i> Gestion des Employés</h3>
+        <p class="text-muted mb-0">Gestion du personnel, des techniciens et de leurs rôles.</p>
+    </div>
+    {% if user.role == "SUPERVISEUR_ANP" %}
+    <a href="{% url 'rh:ajouter_employe' %}" class="btn btn-primary shadow-sm">
+        <i class="fa-solid fa-user-plus me-1"></i> Nouvel Employé
+    </a>
+    {% endif %}
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Nom & Prénom</th>
+                    <th>Métier / Spécialité</th>
+                    <th>Salaire de base</th>
+                    <th>Statut</th>
+                    {% if user.role == "SUPERVISEUR_ANP" %}
+                    <th class="text-end">Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for employe in employes %}
+                <tr class="{% if not employe.actif %}table-secondary text-muted{% endif %}">
+                    <td class="fw-bold">
+                        <i class="fa-solid fa-user me-2 {% if employe.actif %}text-primary{% else %}text-secondary{% endif %}"></i>
+                        {{ employe.nom|upper }} {{ employe.prenom }}
+                    </td>
+                    <td><span class="badge bg-secondary opacity-75">{{ employe.role_metier }}</span></td>
+                    <td class="font-monospace">{{ employe.salaire_base_fixe }} MAD</td>
+                    <td>
+                        {% if employe.actif %}
+                            <span class="badge bg-success"><i class="fa-solid fa-check-circle me-1"></i> Actif</span>
+                        {% else %}
+                            <span class="badge bg-danger"><i class="fa-solid fa-ban me-1"></i> Inactif</span>
+                        {% endif %}
+                    </td>
+                    {% if user.role == "SUPERVISEUR_ANP" %}
+                    <td class="text-end">
+                        <a href="{% url 'rh:modifier_employe' employe.id %}" class="btn btn-sm btn-outline-secondary" title="Modifier">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                        {% if employe.actif %}
+                        <form method="post" action="{% url 'rh:supprimer_employe' employe.id %}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir désactiver cet employé ?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Désactiver">
+                                <i class="fa-solid fa-user-xmark"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">Aucun employé enregistré dans la base de données.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

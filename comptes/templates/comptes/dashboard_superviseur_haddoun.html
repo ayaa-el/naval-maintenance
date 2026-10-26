@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block titre_page %}Tableau de Bord — Superviseur Haddoun{% endblock %}
+{% block contenu %}
+<div class="mb-4">
+  <p class="text-muted">Bienvenue, <strong class="text-dark">{{ user.get_full_name|default:user.username }}</strong>. Gérez vos ordres de travail, bons de livraison et factures.</p>
+</div>
+
+<!-- KPI Cards Row -->
+<div class="row g-4 mb-4">
+  <div class="col-md-6 col-lg-3">
+    <div class="premium-card h-100 mb-0">
+      <div class="card-kpi">
+        <div class="kpi-icon kpi-icon-info"><i class="fa-solid fa-file-circle-plus"></i></div>
+        <div class="kpi-content">
+          <div class="kpi-label">Fiches (Prêtes pour OT)</div>
+          <div class="kpi-value">{{ fiches_avec_diagnostic }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6 col-lg-3">
+    <div class="premium-card h-100 mb-0">
+      <div class="card-kpi">
+        <div class="kpi-icon kpi-icon-warning"><i class="fa-solid fa-truck-ramp-box"></i></div>
+        <div class="kpi-content">
+          <div class="kpi-label">OT Terminés (Sans BL)</div>
+          <div class="kpi-value">{{ ot_termines_sans_bl }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="premium-card h-100 mb-0">
+      <div class="card-kpi">
+        <div class="kpi-icon kpi-icon-success"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <div class="kpi-content">
+          <div class="kpi-label">BL Validés (Sans Facture)</div>
+          <div class="kpi-value">{{ bl_valides_sans_facture }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="premium-card h-100 mb-0">
+      <div class="card-kpi">
+        <div class="kpi-icon kpi-icon-danger"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div class="kpi-content">
+          <div class="kpi-label">Factures en attente</div>
+          <div class="kpi-value">{{ factures_en_attente_anp }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="premium-card mb-4">
+  <div class="card-header">
+    <div><i class="fa-solid fa-file-lines text-ocean me-2"></i> Fiches avec Diagnostic disponibles</div>
+    <a href="{% url 'conventionnement:liste_fiches' %}" class="btn btn-sm btn-outline-maritime">Voir toutes</a>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      {% if recent_fiches %}
+      <table class="table table-premium mb-0">
+        <thead>
+          <tr>
+            <th>N° Fiche</th>
+            <th>Équipement</th>
+            <th>Problème</th>
+            <th>Diagnostic</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for fiche in recent_fiches %}
+          <tr>
+            <td class="fw-bold"><a href="{% url 'conventionnement:detail_fiche' fiche.id %}" class="text-decoration-none">{{ fiche.numero_fiche }}</a></td>
+            <td>{{ fiche.equipement }}</td>
+            <td class="text-muted">{{ fiche.description_probleme|truncatechars:40 }}</td>
+            <td>
+              {% if fiche.precision_probleme %}
+                <span class="badge-premium badge-success">Diagnostiqué</span>
+              {% else %}
+                <span class="badge-premium badge-warning">En attente</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if not fiche.ordre_travail and fiche.precision_probleme %}
+              <a href="{% url 'conventionnement:creer_ordre_travail' fiche.id %}" class="btn btn-sm btn-primary-maritime">
+                <i class="fa-solid fa-plus me-1"></i>Créer OT
+              </a>
+              {% elif fiche.ordre_travail %}
+              <a href="{% url 'conventionnement:detail_ordre' fiche.ordre_travail.id %}" class="btn btn-sm btn-outline-maritime">
+                <i class="fa-solid fa-eye me-1"></i>Voir OT
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="text-center text-muted py-5">
+        <i class="fa-solid fa-inbox fa-2x mb-3 text-light d-block"></i>
+        Aucune fiche disponible.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-md-6">
+    <div class="premium-card h-100 mb-0">
+      <div class="card-header">
+        <div><i class="fa-solid fa-water text-info me-2"></i> Navires Présents (Bassins & Cales)</div>
+      </div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          {% for donnees in occupation_ouvrages %}
+          <li class="list-group-item p-3">
+            <h6 class="fw-bold mb-2">{{ donnees.ouvrage.nom_ouvrage }}</h6>
+            {% if donnees.escales %}
+              {% for escale in donnees.escales %}
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="text-dark"><i class="fa-solid fa-ship text-ocean me-2"></i>{{ escale.navire.nom_navire }} <span class="text-muted small">({{ escale.navire.type_navire }})</span></span>
+                  <span class="badge-premium badge-info">Entrée: {{ escale.date_entree }}</span>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="text-muted small"><i class="fa-solid fa-circle-check text-success me-1"></i> Ouvrage libre</div>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="premium-card h-100 mb-0">
+      <div class="card-header">
+        <div><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i> Pointages Récents (Tâches)</div>
+      </div>
+      <div class="card-body p-0">
+        {% if taches_recentes %}
+        <ul class="list-group list-group-flush">
+          {% for tache in taches_recentes %}
+          <li class="list-group-item p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-bold text-dark">
+                  <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle me-2" style="width: 28px; height: 28px; font-size: 12px;">
+                      <i class="fa-solid fa-user text-muted"></i>
+                  </div>
+                  {{ tache.employe.prenom }} {{ tache.employe.nom }}
+              </span>
+              <span class="text-muted small">{{ tache.date_tache }}</span>
+            </div>
+            <div class="mt-1 small text-muted">
+              <i class="fa-solid fa-wrench me-1 text-ocean"></i> {{ tache.description_travail }} 
+              <span class="badge bg-light text-dark ms-2 border">{{ tache.heure_debut }} - {{ tache.heure_fin }}</span>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="text-center text-muted py-5">
+          Aucun pointage récent.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

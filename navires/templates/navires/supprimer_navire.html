@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titre %}Supprimer navire{% endblock %}
+
+{% block contenu %}
+<div class="card shadow-sm border-danger col-md-6 mx-auto mt-4">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">Confirmer la suppression</h5>
+    </div>
+    <div class="card-body">
+        <p>Êtes-vous sûr de vouloir supprimer le navire <strong>{{ navire.nom_navire }}</strong> ({{ navire.matricule }}) ?</p>
+        <p class="text-danger"><small>Cette action est irréversible et supprimera également toutes les escales et réservations associées.</small></p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex justify-content-end mt-4">
+                <a href="{% url 'navires:liste_navires' %}" class="btn btn-secondary me-2">Annuler</a>
+                <button type="submit" class="btn btn-danger">Supprimer</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

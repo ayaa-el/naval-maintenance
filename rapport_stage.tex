@@ -1,0 +1,427 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{titlesec}
+\usepackage{amsmath}
+\usepackage{float}
+
+% --- Configuration des liens ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=blue,
+    pdftitle={Rapport de Stage - EMSI 3IIR - Système de Maintenance Navale},
+}
+
+% --- Style de code ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+% --- Mise en page ---
+\onehalfspacing
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small EMSI -- 3IIR}
+\fancyhead[R]{\small Rapport de Stage Technique}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+
+% --- Titres ---
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\color{blue}}
+  {\filleft\MakeUppercase{\chaptertemplatename} \thechapter}
+  {1ex}
+  {\titrule\vspace{1ex}\filright\Huge}
+  [\vspace{1ex}\titule]
+\newcommand{\titule}{\titlerule}
+
+\begin{document}
+
+% ==========================================
+% PAGE DE GARDE (Modèle Standard EMSI)
+% ==========================================
+\begin{titlepage}
+    \begin{center}
+        \includegraphics[width=0.4\textwidth]{logo_emsi.png}\\[0.8cm]
+        {\large\textbf{ÉCOLE MAROCAINE DES SCIENCES DE L'INGÉNIEUR}}\\[0.2cm]
+        {\large Filière : Ingénierie Informatique et Réseaux (3IIR)}\\[1.2cm]
+        
+        {\Large \textbf{RAPPORT DE STAGE TECHNIQUE}}\\[0.8cm]
+        
+        \rule{\linewidth}{1.5pt}\\[0.4cm]
+        {\huge \textbf{Système de Gestion Intégrée de la Maintenance Navale et Portuaire}}\\[0.2cm]
+        {\large \textbf{Conception et développement d'une application Desktop (Django \& PyWebView) de suivi documentaire et d'aide à la décision par IA}}\\[0.4cm]
+        \rule{\linewidth}{1.5pt}\\[1.5cm]
+        
+        \begin{minipage}{0.48\textwidth}
+            \begin{flushleft} \large
+                \emph{Réalisé par :}\\
+                \textbf{[Votre Nom et Prénom]}
+            \end{flushleft}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.48\textwidth}
+            \begin{flushright} \large
+                \emph{Encadrant Pédagogique :}\\
+                M. \textbf{[Nom Encadrant EMSI]}\\
+                \vspace{0.2cm]
+                \emph{Encadrant Professionnel :}\\
+                M. \textbf{Mohammed Lahdibi} (ANP)
+            \end{flushright}
+        \end{minipage}\\[2.5cm]
+        
+        \vfill
+        {\large Année Universitaire : 2025/2026}
+    \end{center}
+\end{titlepage}
+
+% ==========================================
+% DÉDICACES & REMERCIEMENTS
+% ==========================================
+\chapter*{Dédicaces}
+\addcontentsline{toc}{chapter}{Dédicaces}
+\begin{center}
+    \emph{À mes parents, qui m'ont soutenu tout au long de mon parcours universitaire avec patience et amour,}\\
+    \emph{À mes enseignants de l'EMSI pour la qualité de leur enseignement,}\\
+    \emph{À toute personne ayant contribué de près ou de loin à la réalisation de ce travail.}
+\end{center}
+
+\chapter*{Remerciements}
+\addcontentsline{toc}{chapter}{Remerciements}
+Je tiens tout d'abord à exprimer ma profonde gratitude à mon encadrant professionnel, M. \textbf{Mohammed Lahdibi}, au sein de l'Agence Nationale des Ports (ANP), pour sa disponibilité, ses conseils constructifs et son mentorat technique.
+
+Mes sincères remerciements s'adressent à la direction technique de la société \textbf{Haddoun} pour m'avoir accueilli dans leurs locaux et facilité l'accès aux données opérationnelles nécessaires à ce projet.
+
+Enfin, je remercie mes professeurs de l'École Marocaine des Sciences de l'Ingénieur (EMSI) pour l'accompagnement pédagogique et les fondements méthodologiques transmis durant ces années de formation.
+
+% ==========================================
+% SOMMAIRE / TABLES
+% ==========================================
+\tableofcontents
+\listoffigures
+\listoftables
+
+% ==========================================
+% INTRODUCTION GÉNÉRALE
+% ==========================================
+\chapter*{Introduction Générale}
+\addcontentsline{toc}{chapter}{Introduction Générale}
+
+Le secteur maritime et portuaire constitue un pilier stratégique de l'économie marocaine, concentrant la quasi-totalité des flux du commerce extérieur. Au cœur de cette infrastructure, le port de Casablanca se distingue par son volume d'activité et la complexité de sa gestion technique. La maintenance des navires et la maintenance des infrastructures portuaires lourdes constituent un enjeu opérationnel critique : chaque jour d'immobilisation d'un navire ou d'une grue de chargement engendre des coûts financiers considérables pour les armateurs et les autorités portuaires.
+
+Ce projet de stage, réalisé dans le cadre de la 3ème année Ingénierie Informatique et Réseaux (3IIR) à l'EMSI, s'articule autour de la collaboration technique entre deux acteurs majeurs : l'Agence Nationale des Ports (ANP) et la société \textbf{Haddoun}, prestataire conventionné de maintenance.
+
+\section*{Problématique}
+Actuellement, la gestion de cette maintenance souffre d'un cloisonnement et d'un manque d'automatisation. Les fiches d'intervention sur les équipements portuaires, la facturation des séjours en Cale Sèche, la planification des réparations des navires ainsi que le pointage et la rémunération des techniciens sont gérés via des processus manuels papier ou des fichiers Excel disparates. Cette gestion manuelle induit un risque élevé d'erreurs de facturation, une absence de visibilité en temps réel pour l'autorité portuaire (ANP) et une impossibilité d'anticiper les durées de séjour des navires.
+
+\section*{Objectif}
+Pour pallier ces défaillances, ce projet propose le développement d'une application desktop intégrée. Conçue avec le framework Python Django et encapsulée de manière native via pywebview, elle assure l'orchestration dynamique du circuit documentaire, le suivi précis de l'activité RH, le calcul automatisé de la tarification et intègre un modèle d'intelligence artificielle prédictif pour l'aide à la décision.
+
+\section*{Structure du Rapport}
+Le présent rapport est organisé comme suit :
+\begin{itemize}
+    \item \textbf{Chapitre 1} présente l'organisme d'accueil, critique l'existant opérationnel et justifie la méthodologie Agile Scrum adoptée.
+    \item \textbf{Chapitre 2} explicite le cahier des charges fonctionnel et non fonctionnel et détaille les scénarios d'utilisation par rôle.
+    \item \textbf{Chapitre 3} décrit la phase de conception à travers les diagrammes UML (statiques et dynamiques) et structure le dictionnaire de données.
+    \item \textbf{Chapitre 4} présente l'environnement technologique, les interfaces de l'application finale et dresse un bilan du projet.
+\end{itemize}
+
+% ==========================================
+% CHAPITRE 1
+% ==========================================
+\chapter{Présentation du Cadre du Projet}
+
+\section{Présentation de la société d'accueil}
+\subsection{L'Agence Nationale des Ports (ANP)}
+L'ANP est l'autorité publique marocaine de régulation et de gestion des ports nationaux (hors Tanger Med). Ses missions couvrent le développement, la maintenance et la modernisation des infrastructures portuaires, ainsi que la garantie des conditions de sécurité et de fluidité du trafic maritime. Au Port de Casablanca, l'ANP administre directement les ouvrages de réparation navale (la Cale Sèche, le Bassin d'Armement et la Cale de Halage).
+
+\subsection{La société Haddoun}
+Haddoun est une entreprise privée marocaine spécialisée dans la construction et la réparation mécanique, métallique, hydraulique et électrique navale. Conventionnée par l'ANP, elle intervient directement sur les navires de commerce en escale ainsi que sur le parc d'équipements de manutention de l'ANP (élévateurs de navires, grues de quai, bateaux-portes).
+
+\section{Étude et critique de l'existant}
+\subsection{Analyse de l'existant}
+La collaboration opérationnelle se découpe en deux activités distinctes :
+\begin{enumerate}
+    \item \textbf{La maintenance des navires en escale} : L'ANP attribue un ouvrage (ex: Cale Sèche) au navire. Haddoun intervient pour réparer les avaries. La facturation finale de l'escale dépend de la durée d'occupation et des services (eau, électricité) fournis.
+    \item \textbf{La maintenance des équipements portuaires} : L'ANP (propriétaire) constate une panne sur une grue ou un élévateur et demande à Haddoun d'intervenir. Haddoun réalise la réparation et facture cette prestation à l'ANP.
+\end{enumerate}
+Toutes ces opérations se font par transmission de formulaires papier (Fiches d'intervention, Bons de commande manuels, Bons de Livraison d'équipements signés à la main) et ressaisies manuelles hebdomadaires dans des classeurs Excel.
+
+\subsection{Critiques formulées}
+\begin{itemize}
+    \item \textbf{Délais administratifs} : Le circuit de validation papier Fiche $\rightarrow$ OT $\rightarrow$ BL $\rightarrow$ Facture prend parfois plusieurs semaines, retardant les paiements.
+    \item \textbf{Erreurs de calcul} : La tarification des consommables (heures de main-d'œuvre, volumes d'eau/électricité) calculée manuellement est sujette à d'importantes discordances.
+    \item \textbf{Planification impossible} : Sans visibilité sur les durées moyennes d'intervention des pannes (soudure, électricité, moteur), l'ANP ne peut pas optimiser la file d'attente d'accès aux cales sèches, causant des embouteillages portuaires.
+\end{itemize}
+
+\section{Solution proposée : Le système de gestion de maintenance}
+Pour structurer et sécuriser ces workflows, nous avons développé une application desktop unifiée sous architecture Django, encapsulant une logique métier propre à chaque organisation. L'originalité réside dans l'inversion du circuit documentaire :
+\begin{itemize}
+    \item \textbf{Circuit Navires} : L'ANP génère la fiche d'intervention et valide le paiement. Haddoun fournit les diagnostics opérationnels, réalise l'intervention et émet la facturation finale.
+    \item \textbf{Circuit Équipements} : L'ANP déclare le problème d'équipement, Haddoun produit l'Ordre de Travail (OT), fournit le Bon de Livraison (BL) et l'ANP en valide la conformité et le prix final.
+\end{itemize}
+
+\section{Méthodologie Scrum et Planning}
+Pour ce stage de 8 semaines, nous avons opté pour le framework Scrum afin d'obtenir un prototype fonctionnel très rapidement et de l'enrichir au fil des retours des encadrants. Le projet est découpé en 4 sprints de 2 semaines chacun (voir Tableau \ref{tab:scrum_planning}).
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llc}
+\toprule
+\textbf{Sprint} & \textbf{Livrables Opérationnels} & \textbf{Semaines} \\
+\midrule
+Sprint 1 & Backlog produit, conception UML et installation Django & 1 - 2 \\
+Sprint 2 & Modèle utilisateur (RBAC), module RH et pointage des techniciens & 3 - 4 \\
+Sprint 3 & Modules Navires, Escales, Facturation portuaire et exports Excel & 5 - 6 \\
+Sprint 4 & Circuits documentaires, Intégration IA (Random Forest) et tests & 7 - 8 \\
+\bottomrule
+\end{tabular}
+\caption{Découpage des Sprints et planning associé}
+\label{tab:scrum_planning}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \color{gray}\framebox[\linewidth]{\parbox{\linewidth}{\centering\vspace{2cm}[Espace réservé : Diagramme de Gantt du planning de stage (Gantt\_Planning.png)]\vspace{2cm}}}
+    \caption{Diagramme de Gantt du projet}
+    \label{fig:gantt}
+\end{figure}
+
+% ==========================================
+% CHAPITRE 2
+% ==========================================
+\chapter{Spécification des Besoins}
+
+\section{Besoins Fonctionnels}
+L'application doit assurer les services suivants :
+\begin{enumerate}
+    \item \textbf{Sécurisation RBAC} : Système de connexion avec sélection d'organisation (ANP ou Haddoun) puis identification par mot de passe.
+    \item \textbf{Gestion RH et Salariale (Haddoun)} :
+    \begin{itemize}
+        \item Pointage des interventions techniques avec calcul automatique des heures travaillées.
+        \item Calcul automatique du salaire mensuel combinant salaire de base fixe et primes associées aux heures réelles.
+    \end{itemize}
+    \item \textbf{Orchestration Documentaire} :
+    \begin{itemize}
+        \item \emph{OT sans Prix} : L'Ordre de Travail initialement validé par l'ANP ne contient que des spécifications techniques (quantités de matériel et heures de travail).
+        \item \emph{Tarification au BL} : L'évaluation financière et la saisie des prix unitaires se font exclusivement lors de l'établissement du Bon de Livraison (BL) par Haddoun.
+        \item \emph{Verrou de Sécurité} : L'émission de la facture verrouille automatiquement l'OT et le diagnostic associé pour empêcher toute falsification. Le déverrouillage nécessite l'intervention d'un Directeur ANP.
+    \end{itemize}
+    \item \textbf{Aide à la Décision par IA} : Moteur prédictif basé sur le type de navire (Cargo, Roro, Tanker, etc.), sa jauge brute et l'avarie déclarée pour anticiper la durée d'occupation en cale.
+\end{enumerate}
+
+\section{Besoins Non Fonctionnels}
+- \textbf{Sécurité} : Hachage PBKDF2 natif de Django pour les mots de passe et protection contre le vol de sessions.
+- \textbf{Performances} : Temps de calcul du modèle d'IA inférieur à 200ms lors de la saisie.
+- \textbf{Robustesse} : Base de données SQLite locale configurée pour résister aux coupures d'alimentation sans perte d'intégrité transactionnelle.
+
+\section{Cas d'Utilisation}
+Les acteurs interagissent selon leurs habilitations spécifiques (voir Figure \ref{fig:usecase}).
+
+\begin{figure}[H]
+    \centering
+    \color{gray}\framebox[\linewidth]{\parbox{\linewidth}{\centering\vspace{3cm}[Espace réservé : Diagramme de Cas d'Utilisation Global (Usecase\_Global.png)]\vspace{3cm}}}
+    \caption{Diagramme de Cas d'Utilisation Global}
+    \label{fig:usecase}
+\end{figure}
+
+% ==========================================
+% CHAPITRE 3
+% ==========================================
+\chapter{Conception du Système}
+
+\section{Conception Statique : Diagramme de classes}
+La structure globale de la base de données est définie par le diagramme de classes (voir Figure \ref{fig:classes}).
+
+\begin{figure}[H]
+    \centering
+    \color{gray}\framebox[\linewidth]{\parbox{\linewidth}{\centering\vspace{3cm}[Espace réservé : Diagramme de Classes (UML\_Classes.png)]\vspace{3cm}}}
+    \caption{Diagramme de Classes UML}
+    \label{fig:classes}
+\end{figure}
+
+\section{Dictionnaire de données}
+Voici la structure détaillée des tables fondamentales :
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Champ (Table : OrdreTravail)} & \textbf{Type} & \textbf{Description} \\
+\midrule
+id & AutoField & Clé primaire \\
+fiche\_intervention\_id & ForeignKey & Lien unique vers la Fiche d'Intervention \\
+numero\_ordre & CharField & Numéro unique généré (OT-YYYY-XXXXXX) \\
+status & CharField & Statut (En attente, Validé, Terminé, Refusé) \\
+montant\_total & DecimalField & Calculé après valorisation du BL (par défaut 0) \\
+bloque\_apres\_facture & BooleanField & True si la facture est émise (verrouillage) \\
+\bottomrule
+\end{tabular}
+\caption{Dictionnaire de données de la table Ordre de Travail}
+\label{tab:dict_ot}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Champ (Table : LigneOrdreTravail)} & \textbf{Type} & \textbf{Description} \\
+\midrule
+id & AutoField & Clé primaire \\
+ordre\_travail\_id & ForeignKey & Lien vers l'Ordre de Travail parent \\
+description & CharField & Intitulé de la tâche / service \\
+quantite & FloatField & Nombre d'heures ou unités de matériel \\
+prix\_unitaire & DecimalField & Saisi lors du BL (défaut : 0) \\
+\bottomrule
+\end{tabular}
+\caption{Dictionnaire de données de la table Ligne d'Ordre de Travail}
+\label{tab:dict_lignes}
+\end{table}
+
+\section{Modélisation Dynamique : Séquences et Activités}
+\subsection{Validation de la Facture et Déblocage}
+Le diagramme de séquence décrit le flux transactionnel de vérification financière. Le Directeur valide la facture, ce qui libère l'ordre de travail et le statut de sortie du navire (voir Figure \ref{fig:seq_facture}).
+
+\begin{figure}[H]
+    \centering
+    \color{gray}\framebox[\linewidth]{\parbox{\linewidth}{\centering\vspace{2.5cm}[Espace réservé : Diagramme de Séquence de Facturation (Sequence\_Facturation.png)]\vspace{2.5cm}}}
+    \caption{Diagramme de Séquence de Validation de Facture}
+    \label{fig:seq_facture}
+\end{figure}
+
+\subsection{Cycle de vie complet d'une Escale}
+Le diagramme d'activité de la Figure \ref{fig:activity_escale} retrace le parcours opérationnel d'un navire de son entrée en port jusqu'à son paiement final.
+
+\begin{figure}[H]
+    \centering
+    \color{gray}\framebox[\linewidth]{\parbox{\linewidth}{\centering\vspace{3cm}[Espace réservé : Diagramme d'Activité Escale (Activity\_Escale.png)]\vspace{3cm}}}
+    \caption{Diagramme d'Activité du Cycle de Vie d'une Escale}
+    \label{fig:activity_escale}
+\end{figure}
+
+% ==========================================
+% CHAPITRE 4
+% ==========================================
+\chapter{Réalisation du Système}
+
+\section{Environnement Technologique}
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Composant} & \textbf{Technologie} & \textbf{Rôle dans l'application} \\
+\midrule
+Backend & Python / Django & Logique métier et gestion de la base de données \\
+Frontend & HTML5 / CSS3 / Bootstrap 5 & Interfaces utilisateur épurées style maritime \\
+Visualisation & Chart.js / Font Awesome & Graphes statistiques et icônes vectorielles \\
+Rapport PDF & ReportLab & Génération dynamique des factures officielles \\
+Moteur d'IA & Scikit-Learn / RandomForest & Modèle prédictif de durée d'escale \\
+Encapsulation & PyWebView & Transformation de l'application web en Desktop (.exe) \\
+\bottomrule
+\end{tabular}
+\caption{Environnement de développement logiciel}
+\label{tab:env}
+\end{table}
+
+\section{Architecture MVT et Desktop locale}
+L'architecture de l'application suit la logique MVT (Model-View-Template) de Django :
+- **Model** : Définit les structures de tables (ex: `OrdreTravail`, `BonLivraison`) avec des méthodes métiers intégrées (ex: `calculer_montant_total`).
+- **View** : Contrôle l'exécution, applique les restrictions de rôles (RBAC) et transmet les contextes de données.
+- **Template** : Rendu dynamique en HTML à l'aide du moteur de templates de Django.
+
+\section{Présentation des Interfaces Réalisées}
+\subsection{Fenêtre de Connexion et Choix de l'Organisation}
+\emph{[Insérer capture d'écran du sélecteur d'organisation et du formulaire d'identification]}
+
+\subsection{Dashboard de Supervision ANP et Haddoun}
+\emph{[Insérer capture d'écran montrant les statistiques de chiffre d'affaires, les taux d'occupation des bassins et le classement des techniciens]}
+
+\subsection{Workflow de Saisie du BL}
+La Figure \ref{fig:screen_bl} illustre le formulaire de saisie des tarifs unitaires lors de l'établissement du BL par Haddoun.
+
+\begin{figure}[H]
+    \centering
+    \color{gray}\framebox[\linewidth]{\parbox{\linewidth}{\centering\vspace{3cm}[Espace réservé : Capture d'écran du formulaire de saisie des prix du BL (Screen\_BL.png)]\vspace{3cm}}}
+    \caption{Interface de saisie des tarifs sur le Bon de Livraison}
+    \label{fig:screen_bl}
+\end{figure}
+
+\section{Gestion des difficultés et Rétrospective}
+Durant ce projet, plusieurs défis techniques ont été relevés :
+\begin{enumerate}
+    \item \textbf{La flexibilité du circuit documentaire} : Gérer les deux circuits documentaires opposés (Navire et Équipement) a nécessité une factorisation rigoureuse des modèles Django avec des clés étrangères optionnelles.
+    \item \textbf{Sécurité \& Verrouillage} : S'assurer qu'un utilisateur ne puisse pas modifier les services ou les diagnostics une fois la facture validée. Nous avons développé une méthode \texttt{is_locked} sur l'Ordre de Travail qui est testée systématiquement avant chaque écriture dans la base.
+\end{enumerate}
+
+% ==========================================
+% CONCLUSION GÉNÉRALE
+% ==========================================
+\chapter*{Conclusion Générale}
+\addcontentsline{toc}{chapter}{Conclusion Générale}
+
+Ce projet de stage a permis de concevoir et de réaliser une application de maintenance navale et portuaire complète, répondant de manière ciblée aux exigences opérationnelles de l'ANP et de Haddoun. 
+
+En intégrant des mécanismes rigoureux de contrôle d'accès, un module documentaire verrouillé lors de la facturation et une aide à la planification par Intelligence Artificielle, cette application supprime les lenteurs des anciens processus papier et Excel.
+
+\section*{Apports Personnels}
+Cette expérience m'a offert l'opportunité d'appliquer concrètement des notions complexes de génie logiciel (Scrum, modélisation UML), de maîtriser le framework Django dans un contexte applicatif desktop (via pywebview) et d'intégrer des technologies de Data Science dans un milieu industriel réel.
+
+\section*{Perspectives d'évolution}
+En guise de perspectives, le système pourrait être étendu de la manière suivante :
+\begin{itemize}
+    \item Alimenter le modèle de prédiction par IA avec des données réelles de trafic portuaire issues des systèmes d'information globaux (Portnet).
+    \item Ajouter un module complet de gestion d'inventaire des pièces de rechange au sein des dépôts Haddoun.
+    \item Mettre en place un système d'Audit Trail détaillé enregistrant l'intégralité des actions (créations, modifications, suppressions) dans un journal d'événements crypté.
+\end{itemize}
+
+% ==========================================
+% BIBLIOGRAPHIE & NETOGRAPHIE
+% ==========================================
+\chapter*{Bibliographie et Nétographie}
+\addcontentsline{toc}{chapter}{Bibliographie et Nétographie}
+
+\begin{enumerate}
+    \item Documentation officielle du framework Django : \url{https://docs.djangoproject.com/}
+    \item Guide d'implémentation de modèles d'IA avec Scikit-Learn : \url{https://scikit-learn.org/}
+    \item Documentation de l'outil d'encapsulation pywebview : \url{https://pywebview.flowrl.com/}
+    \item Spécifications techniques et méthodologie Agile (EMSI).
+\end{enumerate}
+
+\end{document}

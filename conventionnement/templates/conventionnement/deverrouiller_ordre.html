@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block titre %}Déverrouiller Ordre{% endblock %} {% block contenu %}
+<h4 class="text-muted mb-4">Déverrouiller l'ordre {{ ordre.numero_ordre }}</h4>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="card p-4 bg-white">
+    {{ form.non_field_errors }}
+    <div class="mb-3">
+      <label class="form-label"
+        >{{ form.deverrouillage_commentaire.label }}</label
+      >
+      {{ form.deverrouillage_commentaire }} {{       form.deverrouillage_commentaire.errors }}
+    </div>
+    <button class="btn btn-warning">Déverrouiller</button>
+    <a
+      href="{% url 'conventionnement:detail_ordre' ordre.id %}"
+      class="btn btn-secondary ms-2"
+      >Annuler</a
+    >
+  </div>
+</form>
+{% endblock %}

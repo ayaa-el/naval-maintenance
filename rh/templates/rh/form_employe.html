@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block titre %}{{ action }} un Employé{% endblock %}
+
+{% block contenu %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="section-title"><i class="fa-solid fa-user-pen text-primary"></i> {{ action }} un Employé</h3>
+            <a href="{% url 'rh:liste_employes' %}" class="btn btn-outline-secondary shadow-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Retour à la liste
+            </a>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Nom</label>
+                            {{ form.nom }}
+                            {% if form.nom.errors %}<div class="text-danger small">{{ form.nom.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Prénom</label>
+                            {{ form.prenom }}
+                            {% if form.prenom.errors %}<div class="text-danger small">{{ form.prenom.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Métier / Spécialité</label>
+                            {{ form.role_metier }}
+                            {% if form.role_metier.errors %}<div class="text-danger small">{{ form.role_metier.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Salaire de Base Fixe (MAD)</label>
+                            {{ form.salaire_base_fixe }}
+                            {% if form.salaire_base_fixe.errors %}<div class="text-danger small">{{ form.salaire_base_fixe.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            {{ form.actif }}
+                            <label class="form-check-label fw-bold" for="{{ form.actif.id_for_label }}">Employé Actif</label>
+                        </div>
+                        {% if form.actif.errors %}<div class="text-danger small">{{ form.actif.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <a href="{% url 'rh:liste_employes' %}" class="btn btn-light border shadow-sm">Annuler</a>
+                        <button type="submit" class="btn btn-primary shadow-sm">
+                            <i class="fa-solid fa-save me-1"></i> Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

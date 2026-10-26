@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block titre %}Mon Profil{% endblock %}
+
+{% block contenu %}
+<style>
+    .profile-card {
+        border-radius: 20px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+        background: #fff;
+    }
+    
+    .profile-header {
+        background: linear-gradient(135deg, var(--maritime-navy) 0%, var(--maritime-ocean) 100%);
+        padding: 40px 20px 60px;
+        text-align: center;
+        color: white;
+    }
+
+    .profile-avatar-container {
+        margin-top: -50px;
+        text-align: center;
+        position: relative;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid #fff;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        object-fit: cover;
+        background-color: #f1f5f9;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: var(--maritime-muted);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--maritime-text);
+        margin-bottom: 0.4rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid var(--maritime-border);
+        padding: 0.6rem 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .form-control:focus {
+        border-color: var(--maritime-ocean);
+        box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.1);
+    }
+    
+    .custom-file-upload {
+        background-color: #f8fafc;
+        border: 2px dashed var(--maritime-border);
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        transition: all 0.2s;
+    }
+    
+    .custom-file-upload:hover {
+        border-color: var(--maritime-ocean);
+        background-color: #f0f9ff;
+    }
+</style>
+
+<div class="row justify-content-center my-5">
+  <div class="col-lg-7 col-md-9">
+    <div class="profile-card">
+      <div class="profile-header">
+        <h4 class="mb-0 fw-bold">Paramètres du compte</h4>
+        <p class="text-white-50 mb-0">Mettez à jour vos informations personnelles</p>
+      </div>
+      
+      <div class="profile-avatar-container">
+        {% if request.user.photo_profil %}
+            <img src="{{ request.user.photo_profil.url }}" alt="Photo de profil" class="profile-avatar">
+        {% else %}
+            <div class="profile-avatar">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+        {% endif %}
+      </div>
+      
+      <div class="card-body px-4 px-md-5 pb-5 pt-4">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <div class="row mb-3">
+              <div class="col-md-12">
+                  <label class="form-label">{{ form.username.label }}</label>
+                  {{ form.username }}
+                  {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors }}</div>{% endif %}
+              </div>
+          </div>
+          
+          <div class="row mb-3 g-3">
+              <div class="col-md-6">
+                  <label class="form-label">{{ form.first_name.label }}</label>
+                  {{ form.first_name }}
+                  {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                  <label class="form-label">{{ form.last_name.label }}</label>
+                  {{ form.last_name }}
+                  {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors }}</div>{% endif %}
+              </div>
+          </div>
+          
+          <div class="row mb-3">
+              <div class="col-md-12">
+                  <label class="form-label">{{ form.email.label }}</label>
+                  {{ form.email }}
+                  {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+              </div>
+          </div>
+
+          <div class="row mb-3 g-3">
+              <div class="col-md-6">
+                  <label class="form-label">{{ form.telephone.label }}</label>
+                  {{ form.telephone }}
+                  {% if form.telephone.errors %}<div class="text-danger small mt-1">{{ form.telephone.errors }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                  <label class="form-label">{{ form.cin.label }}</label>
+                  {{ form.cin }}
+                  {% if form.cin.errors %}<div class="text-danger small mt-1">{{ form.cin.errors }}</div>{% endif %}
+              </div>
+          </div>
+          
+          <div class="row mb-3">
+              <div class="col-md-12">
+                  <label class="form-label">{{ form.date_naissance.label }}</label>
+                  {{ form.date_naissance }}
+                  {% if form.date_naissance.errors %}<div class="text-danger small mt-1">{{ form.date_naissance.errors }}</div>{% endif %}
+              </div>
+          </div>
+          
+          <div class="row mb-4">
+              <div class="col-md-12">
+                  <label class="form-label">{{ form.photo_profil.label }}</label>
+                  <div class="custom-file-upload">
+                      {{ form.photo_profil }}
+                  </div>
+                  {% if form.photo_profil.errors %}<div class="text-danger small mt-1">{{ form.photo_profil.errors }}</div>{% endif %}
+              </div>
+          </div>
+          
+          <hr class="mb-4">
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a href="{% url 'comptes:accueil' %}" class="btn btn-light px-4 py-2 me-md-2 text-dark border">
+                Annuler
+            </a>
+            <button type="submit" class="btn btn-primary-maritime px-4 py-2">
+              <i class="fa-solid fa-save me-2"></i> Enregistrer les modifications
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

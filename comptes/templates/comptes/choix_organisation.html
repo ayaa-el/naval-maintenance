@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% load static %}
+{% block titre %}Portail de Connexion - ANP & HADDOUN{% endblock %}
+
+{% block contenu %}
+<style>
+    /* Full height container */
+    .auth-wrapper {
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        border-radius: 16px;
+        padding: 40px 20px;
+        box-shadow: inset 0 0 100px rgba(0,0,0,0.02);
+    }
+
+    .auth-title {
+        font-weight: 800;
+        font-size: 2.2rem;
+        color: var(--maritime-dark-navy);
+        margin-bottom: 0.5rem;
+        text-align: center;
+        letter-spacing: -0.5px;
+    }
+
+    .auth-subtitle {
+        color: var(--maritime-muted);
+        font-size: 1.1rem;
+        margin-bottom: 3rem;
+        text-align: center;
+        font-weight: 400;
+    }
+
+    /* Premium Cards with Image Backgrounds */
+    .org-card {
+        border-radius: 20px;
+        padding: 80px 30px;
+        text-align: center;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0,0,0,0.05);
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        background-size: cover;
+        background-position: center;
+        color: white;
+    }
+
+    /* Overlay for text readability */
+    .org-card::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(11, 25, 44, 0.65); /* Dark navy overlay */
+        transition: background 0.4s ease;
+        z-index: 1;
+    }
+    
+    .org-card:hover::after {
+        background: rgba(11, 25, 44, 0.4);
+    }
+
+    .org-card > * {
+        position: relative;
+        z-index: 2;
+    }
+
+    .org-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, transparent, transparent);
+        transition: all 0.3s ease;
+        z-index: 3;
+    }
+
+    /* specific themes */
+    .org-card.haddoun {
+        background-image: url("{% static 'img/haddoun_bg.jpg' %}");
+    }
+    .org-card.haddoun::before {
+        background: linear-gradient(90deg, #38BDF8, #0ea5e9);
+    }
+    
+    .org-card.anp {
+        background-image: url("{% static 'img/port_bg.jpg' %}");
+    }
+    .org-card.anp::before {
+        background: linear-gradient(90deg, var(--maritime-navy), var(--maritime-ocean));
+    }
+
+    .org-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25), 0 5px 15px rgba(0,0,0,0.15);
+        text-decoration: none;
+    }
+
+    .org-icon-container {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+        color: white;
+    }
+
+    .org-card:hover .org-icon-container {
+        transform: scale(1.15) translateY(-5px);
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .org-icon {
+        font-size: 2.2rem;
+    }
+
+    .org-name {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .org-desc {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0;
+        font-weight: 500;
+    }
+</style>
+
+<div class="auth-wrapper mt-2 mb-4">
+    <h1 class="auth-title">Bienvenue sur le Portail</h1>
+    <p class="auth-subtitle">Veuillez sélectionner votre organisation pour vous connecter</p>
+    
+    <div class="container mb-5">
+        <div class="row justify-content-center g-4">
+            <!-- Carte HADDOUN -->
+            <div class="col-md-6 col-lg-5">
+                <a href="{% url 'comptes:connexion' organisation='haddoun' %}" class="org-card haddoun text-decoration-none">
+                    <div class="org-icon-container">
+                        <i class="fa-solid fa-screwdriver-wrench org-icon"></i>
+                    </div>
+                    <h3 class="org-name">HADDOUN</h3>
+                    <p class="org-desc">Conventionnaire technique</p>
+                </a>
+            </div>
+            
+            <!-- Carte ANP -->
+            <div class="col-md-6 col-lg-5">
+                <a href="{% url 'comptes:connexion' organisation='anp' %}" class="org-card anp text-decoration-none">
+                    <div class="org-icon-container">
+                        <i class="fa-solid fa-anchor org-icon"></i>
+                    </div>
+                    <h3 class="org-name">ANP</h3>
+                    <p class="org-desc">Agence Nationale des Ports</p>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section Description des Rôles -->
+    <div class="container">
+        <div class="row justify-content-center mt-5 pt-4">
+            <div class="col-lg-10">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="p-4 rounded-4 h-100" style="background: rgba(56, 189, 248, 0.05); border-left: 4px solid #0ea5e9;">
+                            <h5 style="color: #0ea5e9; font-weight: 700;"><i class="fa-solid fa-gears me-2"></i>Rôle de Haddoun</h5>
+                            <p class="text-muted mb-0" style="font-size: 0.95rem; line-height: 1.6;">
+                                L'entreprise <strong>Haddoun</strong> intervient en tant que conventionnaire technique. Ses équipes (chefs d'équipe et techniciens) sont chargées d'inspecter les navires, de poser des <strong>diagnostics techniques précis</strong>, de réaliser les <strong>réparations physiques</strong> sur le chantier, puis d'établir les bons de livraison et la facturation des travaux achevés.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="p-4 rounded-4 h-100" style="background: rgba(30, 62, 98, 0.05); border-left: 4px solid var(--maritime-navy);">
+                            <h5 style="color: var(--maritime-navy); font-weight: 700;"><i class="fa-solid fa-shield-halved me-2"></i>Rôle de l'ANP</h5>
+                            <p class="text-muted mb-0" style="font-size: 0.95rem; line-height: 1.6;">
+                                L'<strong>Agence Nationale des Ports (ANP)</strong> assure la supervision globale. Ses agents gèrent l'accès aux ouvrages (bassins d'armement), initient les <strong>fiches d'intervention</strong>, suivent l'avancement des réparations au quotidien et valident la conformité des travaux avant de procéder au <strong>paiement des factures</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

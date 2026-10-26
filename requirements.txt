@@ -1,0 +1,9 @@
+Django>=5.0,<7.0
+asgiref>=3.8.0
+sqlparse>=0.5.0
+tzdata
+pillow>=10.0.0
+reportlab>=4.0.0
+openpyxl>=3.1.0
+pandas>=2.0.0
+numpy>=1.26.0

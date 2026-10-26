@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titre %}Maintenance Navale{% endblock %}</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
+    <!-- Chart.js (Optional, loaded globally for dashboards) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    {% if user.is_authenticated %}
+    <!-- ─── SIDEBAR ────────────────────────────────────────────────────────── -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'comptes:accueil' %}" class="sidebar-brand">
+                <i class="fa-solid fa-ship me-2"></i>ANP<span>HADDOUN</span>
+            </a>
+        </div>
+
+        <nav class="sidebar-menu">
+            <div class="sidebar-menu-title">Navigation Principale</div>
+            
+            <a href="{% url 'comptes:accueil' %}" class="sidebar-link {% if request.resolver_match.url_name == 'accueil' or request.resolver_match.url_name == 'tableau_bord' %}active{% endif %}">
+                <i class="fa-solid fa-gauge"></i> Tableau de bord
+            </a>
+            
+            <a href="{% url 'conventionnement:liste_fiches' %}" class="sidebar-link {% if 'fiches' in request.path %}active{% endif %}">
+                <i class="fa-regular fa-folder-open"></i> Dossiers Techniques
+            </a>
+
+            {% if user.role == "SUPERVISEUR_ANP" or user.role == "CHEF_EQUIPE" or user.role == "TECHNICIEN_ANP" or user.role == "TECHNICIEN_HADDOUN" %}
+            <div class="sidebar-menu-title mt-4">Opérations</div>
+            <a href="{% url 'navires:liste_navires' %}" class="sidebar-link {% if 'navires' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-anchor"></i> Navires & Escales
+            </a>
+            {% endif %}
+
+            {% if user.role == "SUPERVISEUR_ANP" or user.role == "TECHNICIEN_ANP" %}
+            <div class="sidebar-menu-title mt-4">Ressources & Pointage</div>
+            <a href="{% url 'rh:liste_employes' %}" class="sidebar-link {% if 'employes' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-users-gear"></i> Employés Haddoun
+            </a>
+            <a href="{% url 'rh:liste_taches' %}" class="sidebar-link {% if 'taches' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-clipboard-check"></i> Pointage Horaire
+            </a>
+            {% endif %}
+
+            {% if user.role == "SUPERVISEUR_ANP" %}
+            <div class="sidebar-menu-title mt-4">Administration</div>
+            <a href="{% url 'equipements:liste_equipements' %}" class="sidebar-link {% if 'equipements' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-screwdriver-wrench"></i> Équipements
+            </a>
+            <a href="{% url 'facturation:liste_escales' %}" class="sidebar-link {% if 'facturation' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-file-invoice-dollar"></i> Facturation
+            </a>
+            {% endif %}
+            
+            <!-- Link if Director role still has facturation views -->
+            {% if user.role in "DIRECTEUR,DIRECTEUR_HADDOUN" %}
+            <a href="{% url 'facturation:liste_escales' %}" class="sidebar-link {% if 'facturation' in request.path %}active{% endif %}">
+                <i class="fa-solid fa-file-invoice-dollar"></i> Suivi Facturation
+            </a>
+            {% endif %}
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="dropdown">
+                <a href="#" class="user-profile-widget" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="user-avatar">
+                        {% if user.photo_profil %}
+                            <img src="{{ user.photo_profil.url }}" alt="Avatar">
+                        {% else %}
+                            <i class="fa-solid fa-user"></i>
+                        {% endif %}
+                    </div>
+                    <div class="user-info">
+                        <div class="name">{{ user.username }}</div>
+                        <div class="role">{{ user.get_role_display }}</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-up ms-auto text-muted"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark shadow" style="width: 100%; margin-bottom: 10px;">
+                    <li><a class="dropdown-item" href="{% url 'comptes:mon_profil' %}"><i class="fa-regular fa-id-card me-2"></i> Mon Profil</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'comptes:deconnexion' %}"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Déconnexion</a></li>
+                </ul>
+            </div>
+        </div>
+    </aside>
+    {% endif %}
+
+    <!-- ─── MAIN CONTENT ───────────────────────────────────────────────────── -->
+    {% if user.is_authenticated %}
+    <main class="main-content">
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <h2 class="page-title">
+                {% block titre_page %}Tableau de bord{% endblock %}
+            </h2>
+            <div class="d-flex align-items-center gap-3">
+                <span class="role-badge {% if user.is_anp %}role-anp{% else %}role-haddoun{% endif %}">
+                    <i class="fa-solid fa-circle-check me-1"></i> Organisation : {{ user.organisation|upper }}
+                </span>
+            </div>
+        </header>
+    {% else %}
+    <!-- Layout pour les pages publiques (Connexion, choix organisation) -->
+    <main class="w-100 min-vh-100 d-flex flex-column" style="background-color: var(--maritime-bg);">
+    {% endif %}
+
+        <!-- MESSAGES -->
+        {% if messages %}
+            <div class="{% if user.is_authenticated %}mb-4{% else %}container mt-3{% endif %}">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-left: 4px solid currentColor;">
+                    <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'danger' or message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %} me-2"></i> 
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- PAGE CONTENT -->
+        {% block contenu %}{% endblock %}
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

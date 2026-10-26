@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block titre_page %}Navires & Escales{% endblock %}
+
+{% block contenu %}
+<div class="premium-card mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom-0">
+        <div>
+            <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-anchor text-ocean me-2"></i> Flotte et Navires</h5>
+            <small class="text-muted">Gérez les navires enregistrés et leurs escales en cours.</small>
+        </div>
+        {% if peut_modifier %}
+        <a href="{% url 'navires:ajouter_navire' %}" class="btn btn-primary-maritime">
+            <i class="fa-solid fa-plus me-1"></i> Ajouter un navire
+        </a>
+        {% endif %}
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-premium mb-0">
+                <thead>
+                    <tr>
+                        <th>Matricule</th>
+                        <th>Nom du Navire</th>
+                        <th>Caractéristiques</th>
+                        <th>Escales en cours</th>
+                        {% if peut_modifier %}
+                        <th class="text-end">Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in donnees %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ item.navire.matricule }}</td>
+                        <td class="fw-semibold">
+                            <i class="fa-solid fa-ship text-muted me-2"></i>{{ item.navire.nom_navire }}
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ item.navire.type_navire }}</span>
+                            <small class="text-muted d-block mt-1">{{ item.navire.tonnage }}t • L: {{ item.navire.taille }}m</small>
+                        </td>
+                        <td>
+                            {% for escale in item.escales_en_cours %}
+                                <div class="mb-2 p-2 bg-light rounded border border-light-subtle">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="badge-premium badge-info"><i class="fa-solid fa-location-dot me-1"></i>{{ escale.ouvrage.nom_ouvrage }}</span>
+                                        <small class="text-muted">{{ escale.date_entree|date:"d M Y" }}</small>
+                                    </div>
+                                    {% if peut_modifier %}
+                                    <div class="d-flex gap-1 mt-2">
+                                        <form method="post" action="{% url 'navires:clore_escale' escale.id %}" class="m-0 p-0">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2" onclick="return confirm('Clôturer cette escale ?')" title="Marquer comme terminée">
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
+                                        </form>
+                                        {% if user.role == "TECHNICIEN_ANP" %}
+                                        <a href="{% url 'conventionnement:creer_fiche_navire' escale.id %}" class="btn btn-sm btn-outline-danger py-1 px-2" title="Créer Fiche d'Intervention">
+                                            <i class="fa-solid fa-file-medical"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            {% empty %}
+                                <span class="text-muted fst-italic"><i class="fa-solid fa-water me-1"></i> En mer (Aucune escale)</span>
+                            {% endfor %}
+                            {% if peut_modifier %}
+                            <div class="mt-2">
+                                <a href="{% url 'navires:ajouter_escale' item.navire.matricule %}" class="btn btn-sm btn-outline-maritime py-1 w-100">
+                                    <i class="fa-solid fa-arrow-right-to-bracket me-1"></i>Déclarer une escale
+                                </a>
+                            </div>
+                            {% endif %}
+                        </td>
+                        {% if peut_modifier %}
+                        <td class="text-end">
+                            <div class="table-actions justify-content-end">
+                                <a href="{% url 'navires:modifier_navire' item.navire.matricule %}" class="btn btn-icon-only btn-outline-warning" title="Modifier">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a href="{% url 'navires:supprimer_navire' item.navire.matricule %}" class="btn btn-icon-only btn-outline-danger" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce navire ?')">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </div>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{% if peut_modifier %}5{% else %}4{% endif %}" class="text-center text-muted py-5">
+                            <i class="fa-solid fa-anchor fa-2x mb-3 text-light d-block"></i>
+                            Aucun navire enregistré pour le moment.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

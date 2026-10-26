@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block titre %}Supprimer {{ equipement.nom }}{% endblock %}
+{% block contenu %}
+<div class="row justify-content-center mt-5">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm border-danger border-top border-3">
+      <div class="card-body text-center p-5">
+        <i class="fa-solid fa-trash text-danger fa-3x mb-3"></i>
+        <h4 class="fw-bold">Supprimer « {{ equipement.nom }} » ?</h4>
+        <p class="text-muted">Cette action est <strong>irréversible</strong>. L'équipement <strong>{{ equipement.nom }}</strong> (Réf: {{ equipement.reference }}) sera définitivement supprimé.</p>
+        {% if equipement.statut == "EN_REPARATION" %}
+        <div class="alert alert-warning text-start">
+          <i class="fa-solid fa-triangle-exclamation me-2"></i>
+          Cet équipement est actuellement <strong>en réparation</strong>. Des fiches d'intervention peuvent y être liées.
+        </div>
+        {% endif %}
+        <form method="post" class="d-flex justify-content-center gap-3 mt-4">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-lg">
+            <i class="fa-solid fa-trash me-2"></i> Confirmer la suppression
+          </button>
+          <a href="{% url 'equipements:liste_equipements' %}" class="btn btn-outline-secondary btn-lg">Annuler</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

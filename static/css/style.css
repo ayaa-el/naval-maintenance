@@ -1,0 +1,521 @@
+/* Theme Maritime Professionnel - Maintenance Navale ANP & HADDOUN (Soutenance Edition) */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    /* Couleurs principales (Maritime Premium) */
+    --maritime-dark-navy: #091321;
+    --maritime-navy: #152A47;
+    --maritime-ocean: #0ea5e9;
+    --maritime-ocean-dark: #0284c7;
+    --maritime-cyan: #38bdf8;
+    
+    /* Couleurs de fond et surfaces */
+    --maritime-bg: #f8fafc;
+    --maritime-card-bg: #ffffff;
+    --maritime-sidebar-bg: #0f172a;
+    
+    /* Textes */
+    --maritime-text: #0f172a;
+    --maritime-text-muted: #64748b;
+    --maritime-border: #e2e8f0;
+    
+    /* Statuts */
+    --statut-success: #10b981;
+    --statut-success-bg: #d1fae5;
+    --statut-warning: #f59e0b;
+    --statut-warning-bg: #fef3c7;
+    --statut-danger: #ef4444;
+    --statut-danger-bg: #fee2e2;
+    --statut-info: #3b82f6;
+    --statut-info-bg: #dbeafe;
+
+    /* Ombres et Effets */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-card: 0px 4px 20px rgba(0, 0, 0, 0.03);
+    
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--maritime-bg);
+    color: var(--maritime-text);
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    color: var(--maritime-dark-navy);
+}
+
+/* ─── SIDEBAR LAYOUT ─────────────────────────────────────────────────── */
+.sidebar {
+    width: 280px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: linear-gradient(180deg, var(--maritime-sidebar-bg) 0%, var(--maritime-dark-navy) 100%);
+    color: white;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-brand {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: white;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+}
+.sidebar-brand span {
+    color: var(--maritime-cyan);
+}
+
+.sidebar-menu {
+    padding: 1.5rem 1rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.sidebar-menu-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    font-weight: 600;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.8rem 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    margin-bottom: 0.4rem;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.sidebar-link i {
+    width: 20px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.sidebar-link:hover, .sidebar-link.active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    text-decoration: none;
+}
+.sidebar-link.active {
+    background: var(--maritime-ocean);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.user-profile-widget {
+    background: rgba(255,255,255,0.05);
+    padding: 0.8rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+}
+.user-profile-widget:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--maritime-ocean);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    overflow: hidden;
+}
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-info {
+    line-height: 1.2;
+}
+.user-info .name {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.user-info .role {
+    font-size: 0.75rem;
+    color: var(--maritime-cyan);
+}
+
+/* ─── MAIN CONTENT AREA ──────────────────────────────────────────────── */
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 2rem 2.5rem;
+    min-height: 100vh;
+    transition: margin-left 0.3s;
+    background-color: var(--maritime-bg);
+}
+
+/* Topbar Header */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.page-title {
+    margin-bottom: 0;
+    font-size: 1.5rem;
+    font-family: 'Outfit', sans-serif;
+    color: var(--maritime-navy);
+}
+
+/* Badges rôle */
+.role-badge {
+    font-size: 0.7rem;
+    padding: 0.3em 0.8em;
+    border-radius: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.role-anp { background-color: var(--maritime-cyan); color: #000; }
+.role-haddoun { background-color: #38BDF8; color: #0F172A; }
+.role-directeur { background-color: #F59E0B; color: #000; }
+
+/* ─── PREMIUM CARDS & WIDGETS ────────────────────────────────────────── */
+.premium-card {
+    background: var(--maritime-card-bg);
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.premium-card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.premium-card .card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--maritime-border);
+    padding: 1.25rem 1.5rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--maritime-navy);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-kpi {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--maritime-ocean);
+    border-radius: 4px 0 0 4px;
+}
+
+.kpi-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+}
+
+.kpi-icon-ocean { background: #e0f2fe; color: var(--maritime-ocean); }
+.kpi-icon-success { background: var(--statut-success-bg); color: var(--statut-success); }
+.kpi-icon-warning { background: var(--statut-warning-bg); color: var(--statut-warning); }
+.kpi-icon-danger { background: var(--statut-danger-bg); color: var(--statut-danger); }
+.kpi-icon-navy { background: #f1f5f9; color: var(--maritime-navy); }
+
+.kpi-content { flex: 1; }
+.kpi-label {
+    font-size: 0.85rem;
+    color: var(--maritime-text-muted);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.kpi-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--maritime-navy);
+    font-family: 'Outfit', sans-serif;
+    line-height: 1;
+}
+
+/* ─── TABLES ─────────────────────────────────────────────────────────── */
+.table-responsive {
+    border-radius: var(--radius-lg);
+    background: white;
+    box-shadow: var(--shadow-card);
+    padding: 0;
+    overflow: hidden;
+}
+
+.table-premium {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-premium thead th {
+    background-color: #f8fafc;
+    color: var(--maritime-text-muted);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--maritime-border);
+    white-space: nowrap;
+}
+
+.table-premium tbody td {
+    padding: 1rem 1.25rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--maritime-text);
+    font-size: 0.95rem;
+}
+
+.table-premium tbody tr {
+    transition: background-color 0.2s;
+}
+
+.table-premium tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.table-premium tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Badges d'état */
+.badge-premium {
+    padding: 0.4em 0.8em;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.badge-success { background: var(--statut-success-bg); color: var(--statut-success); }
+.badge-warning { background: var(--statut-warning-bg); color: var(--statut-warning); }
+.badge-danger { background: var(--statut-danger-bg); color: var(--statut-danger); }
+.badge-info { background: var(--statut-info-bg); color: var(--statut-info); }
+
+/* ─── BUTTONS ────────────────────────────────────────────────────────── */
+.btn {
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+    transition: all 0.2s;
+}
+
+.btn-primary-maritime {
+    background: var(--maritime-ocean);
+    border-color: var(--maritime-ocean);
+    color: white;
+    box-shadow: 0 4px 6px rgba(14, 165, 233, 0.2);
+}
+.btn-primary-maritime:hover {
+    background: var(--maritime-ocean-dark);
+    border-color: var(--maritime-ocean-dark);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 8px rgba(14, 165, 233, 0.3);
+}
+
+.btn-outline-maritime {
+    border: 1.5px solid var(--maritime-border);
+    color: var(--maritime-text);
+    background: white;
+}
+.btn-outline-maritime:hover {
+    background: var(--maritime-bg);
+    border-color: #cbd5e1;
+}
+
+.btn-icon-only {
+    padding: 0.4rem 0.6rem;
+    font-size: 1rem;
+    border-radius: 6px;
+}
+
+/* Action buttons in tables */
+.table-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ─── FORMS ──────────────────────────────────────────────────────────── */
+.form-label {
+    font-weight: 500;
+    color: var(--maritime-navy);
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+}
+
+.form-control, .form-select {
+    border: 1px solid var(--maritime-border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    color: var(--maritime-text);
+    transition: all 0.2s;
+    background-color: #f8fafc;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: white;
+    border-color: var(--maritime-ocean);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+/* Timeline pour vue détaillée */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+    margin-bottom: 2rem;
+}
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--maritime-border);
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+.timeline-icon {
+    position: absolute;
+    left: -2rem;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--maritime-ocean);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    color: var(--maritime-ocean);
+    z-index: 1;
+}
+.timeline-icon.completed {
+    background: var(--maritime-ocean);
+    color: white;
+}
+.timeline-content {
+    background: white;
+    border: 1px solid var(--maritime-border);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+.timeline-date {
+    font-size: 0.8rem;
+    color: var(--maritime-text-muted);
+}
+.timeline-title {
+    font-weight: 600;
+    color: var(--maritime-navy);
+    margin-bottom: 0.25rem;
+}
+
+/* Utilities */
+.text-cyan { color: var(--maritime-cyan) !important; }
+.text-ocean { color: var(--maritime-ocean) !important; }
+
+/* ─── IMPRESSION ─────────────────────────────────────────────────── */
+@media print {
+    .sidebar, .topbar, .btn, .no-print {
+        display: none !important;
+    }
+    .main-content {
+        margin-left: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+    }
+    body {
+        background: white !important;
+    }
+    .premium-card {
+        box-shadow: none !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+}
+

@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block titre %}Tableau de Bord ANP — Équipements Portuaires{% endblock %}
+
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="section-title"><i class="fa-solid fa-gears text-primary"></i> Espace ANP — Gestion des Équipements</h3>
+        <p class="text-muted mb-0">Suivi technique et opérationnel des équipements du port.</p>
+    </div>
+    {% if user.role == 'SUPERVISEUR_ANP' %}
+    <a href="{% url 'conventionnement:creer_fiche_equipement' %}" class="btn btn-maritime-primary shadow-sm">
+        <i class="fa-solid fa-plus me-1"></i> Créer une fiche d'intervention
+    </a>
+    {% endif %}
+</div>
+
+<!-- KPI Cards Grid -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="card card-kpi p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold">Total Équipements</div>
+                    <div class="h3 fw-bold mb-0 text-dark">{{ total_equipements }}</div>
+                </div>
+                <div class="kpi-icon kpi-icon-ocean">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card card-kpi p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold">En Service</div>
+                    <div class="h3 fw-bold mb-0 text-success">{{ equipements_en_service }}</div>
+                </div>
+                <div class="kpi-icon kpi-icon-success">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card card-kpi p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold">En Réparation</div>
+                    <div class="h3 fw-bold mb-0 text-warning">{{ equipements_en_reparation }}</div>
+                </div>
+                <div class="kpi-icon kpi-icon-warning">
+                    <i class="fa-solid fa-wrench"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card card-kpi p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold">Hors Service</div>
+                    <div class="h3 fw-bold mb-0 text-danger">{{ equipements_hors_service }}</div>
+                </div>
+                <div class="kpi-icon kpi-icon-danger">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Secondary KPIs: Validations Pending -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-3 bg-white border-start border-4 border-info">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small font-monospace">CONVENTIONNEMENT</span>
+                    <h5 class="fw-bold mb-0 mt-1">Fiches Ouvertes</h5>
+                </div>
+                <span class="badge bg-info fs-5 px-3 py-2 rounded-pill">{{ fiches_ouvertes }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-3 bg-white border-start border-4 border-warning">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small font-monospace">ACTION REQUISE</span>
+                    <h5 class="fw-bold mb-0 mt-1">OT à Valider (ANP)</h5>
+                </div>
+                <span class="badge bg-warning text-dark fs-5 px-3 py-2 rounded-pill">{{ ot_attente_validation }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-3 bg-white border-start border-4 border-primary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small font-monospace">ACTION REQUISE</span>
+                    <h5 class="fw-bold mb-0 mt-1">BL à Valider (ANP)</h5>
+                </div>
+                <span class="badge bg-primary fs-5 px-3 py-2 rounded-pill">{{ bl_attente_validation }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Section: Equipments & Recent Fiches -->
+<div class="row g-4">
+    <!-- List of Equipments -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-list-check text-primary me-2"></i> Parc Équipements ANP</h5>
+                <span class="badge bg-light text-dark border">Base de données ANP</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Référence</th>
+                            <th>Équipement</th>
+                            <th>Type</th>
+                            <th>Localisation</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for eq in equipements_list %}
+                        <tr>
+                            <td class="fw-semibold text-primary">{{ eq.reference }}</td>
+                            <td class="fw-bold">{{ eq.nom }}</td>
+                            <td><span class="badge bg-secondary opacity-75">{{ eq.get_type_equipement_display }}</span></td>
+                            <td class="small text-muted"><i class="fa-solid fa-location-dot me-1"></i> {{ eq.localisation|default:"-" }}</td>
+                            <td>
+                                {% if eq.statut == 'EN_SERVICE' %}
+                                    <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> En service</span>
+                                {% elif eq.statut == 'EN_REPARATION' %}
+                                    <span class="badge bg-warning text-dark"><i class="fa-solid fa-wrench me-1"></i> En réparation</span>
+                                {% else %}
+                                    <span class="badge bg-danger"><i class="fa-solid fa-ban me-1"></i> Hors service</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">Aucun équipement enregistré.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Interventions -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i> Dernières Fiches Équipement</h5>
+                <a href="{% url 'conventionnement:liste_fiches' %}" class="small text-decoration-none">Tout voir <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for fiche in recent_fiches %}
+                <a href="{% url 'conventionnement:detail_fiche' fiche.id %}" class="list-group-item list-group-item-action p-3">
+                    <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                        <span class="fw-bold text-dark">{{ fiche.numero_fiche }}</span>
+                        <small class="text-muted"><i class="fa-regular fa-calendar me-1"></i> {{ fiche.date_creation|date:"d/m/Y" }}</small>
+                    </div>
+                    <p class="mb-1 text-primary fw-semibold small"><i class="fa-solid fa-screwdriver-wrench me-1"></i> {{ fiche.equipement.nom }}</p>
+                    <small class="text-muted d-block text-truncate">{{ fiche.description_probleme }}</small>
+                </a>
+                {% empty %}
+                <div class="p-4 text-center text-muted">Aucune fiche récente.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

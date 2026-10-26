@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% block titre_page %}Tableau de Bord — Superviseur ANP{% endblock %}
+{% block contenu %}
+<div class="mb-4">
+  <p class="text-muted">Bienvenue, <strong class="text-dark">{{ user.get_full_name|default:user.username }}</strong>. Voici un aperçu global des opérations.</p>
+</div>
+
+<!-- KPI Cards Row -->
+<div class="row g-4 mb-4">
+  <div class="col-md-4 col-lg-2">
+    <div class="premium-card h-100 mb-0">
+      <div class="card-kpi">
+        <div class="kpi-icon kpi-icon-ocean"><i class="fa-solid fa-gears"></i></div>
+        <div class="kpi-content">
+          <div class="kpi-label">Équipements</div>
+          <div class="kpi-value">{{ total_equipements }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4 col-lg-2">
+    <div class="premium-card h-100 mb-0">
+      <div class="card-kpi">
+        <div class="kpi-icon kpi-icon-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="kpi-content">
+          <div class="kpi-label">Fiches</div>
+          <div class="kpi-value">{{ fiches_ouvertes }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 col-lg-2">
+    <div class="premium-card h-100 mb-0">
+      <div class="card-kpi">
+        <div class="kpi-icon kpi-icon-warning"><i class="fa-solid fa-clipboard-check"></i></div>
+        <div class="kpi-content">
+          <div class="kpi-label">OT à Valider</div>
+          <div class="kpi-value">{{ ot_attente_validation }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 col-lg-2">
+    <div class="premium-card h-100 mb-0">
+      <div class="card-kpi">
+        <div class="kpi-icon kpi-icon-info"><i class="fa-solid fa-truck-ramp-box"></i></div>
+        <div class="kpi-content">
+          <div class="kpi-label">BL à Valider</div>
+          <div class="kpi-value">{{ bl_attente_validation }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 col-lg-2">
+    <div class="premium-card h-100 mb-0">
+      <div class="card-kpi">
+        <div class="kpi-icon kpi-icon-success"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <div class="kpi-content">
+          <div class="kpi-label">Factures</div>
+          <div class="kpi-value">{{ factures_a_valider }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 col-lg-2">
+    <div class="premium-card h-100 mb-0">
+      <div class="card-kpi">
+        <div class="kpi-icon kpi-icon-navy"><i class="fa-solid fa-users"></i></div>
+        <div class="kpi-content">
+          <div class="kpi-label">Employés</div>
+          <div class="kpi-value">{{ total_employes }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Colonne Gauche : Data Tables -->
+  <div class="col-lg-8">
+    <div class="premium-card">
+      <div class="card-header">
+        <div><i class="fa-solid fa-gears text-ocean me-2"></i> État des Équipements</div>
+        <a href="{% url 'conventionnement:creer_fiche_equipement' %}" class="btn btn-sm btn-primary-maritime">
+          <i class="fa-solid fa-plus me-1"></i>Nouvelle Fiche
+        </a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          {% if equipements_list %}
+          <table class="table table-premium mb-0">
+            <thead>
+              <tr>
+                <th>Équipement</th>
+                <th>Type</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for eq in equipements_list %}
+              <tr>
+                <td class="fw-semibold">{{ eq.nom }}</td>
+                <td class="text-muted">{{ eq.get_type_equipement_display }}</td>
+                <td>
+                  {% if eq.statut == "EN_SERVICE" %}<span class="badge-premium badge-success">En service</span>
+                  {% elif eq.statut == "EN_REPARATION" %}<span class="badge-premium badge-warning">En réparation</span>
+                  {% else %}<span class="badge-premium badge-danger">Hors service</span>{% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="text-center text-muted py-5">
+             <i class="fa-solid fa-folder-open fa-2x mb-3 text-light"></i><br>
+             Aucun équipement enregistré.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="premium-card">
+      <div class="card-header">
+        <div><i class="fa-solid fa-user-clock text-cyan me-2"></i> Pointages Employés Récents</div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          {% if taches_recentes %}
+          <table class="table table-premium mb-0">
+            <thead>
+              <tr>
+                <th>Employé</th>
+                <th>Tâche</th>
+                <th>Date</th>
+                <th>Saisi par</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for tache in taches_recentes %}
+              <tr>
+                <td class="fw-semibold">
+                   <div class="d-flex align-items-center gap-2">
+                      <div class="user-avatar" style="width:28px; height:28px; font-size:10px;"><i class="fa-solid fa-user"></i></div>
+                      {{ tache.employe }}
+                   </div>
+                </td>
+                <td class="text-muted">{{ tache.description_travail|truncatechars:45 }}</td>
+                <td>{{ tache.date_tache }}</td>
+                <td class="text-muted">{{ tache.saisi_par|default:"—" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="text-center text-muted py-5">Aucun pointage récent.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colonne Droite : Actions & Alertes -->
+  <div class="col-lg-4">
+    <div class="premium-card">
+      <div class="card-header">
+        <div><i class="fa-solid fa-bolt text-warning me-2"></i> Actions Rapides</div>
+      </div>
+      <div class="card-body d-grid gap-3 p-4">
+        <a href="{% url 'conventionnement:creer_fiche_equipement' %}" class="btn btn-primary-maritime text-start py-2">
+          <i class="fa-solid fa-file-medical w-20 text-center me-2"></i> Créer une Fiche d'Intervention
+        </a>
+        <a href="{% url 'conventionnement:liste_fiches' %}" class="btn btn-outline-maritime text-start py-2">
+          <i class="fa-solid fa-list-check w-20 text-center me-2"></i> Voir Toutes les Fiches
+        </a>
+        <a href="{% url 'rh:liste_employes' %}" class="btn btn-outline-maritime text-start py-2">
+          <i class="fa-solid fa-users w-20 text-center me-2"></i> Gérer les Employés
+        </a>
+      </div>
+    </div>
+
+    <div class="premium-card">
+      <div class="card-header">
+        <div><i class="fa-solid fa-bell text-danger me-2"></i> Alertes à Traiter</div>
+      </div>
+      <div class="card-body p-4">
+        {% if ot_attente_validation > 0 %}
+        <div class="alert alert-warning border-0 shadow-sm mb-3">
+          <div class="d-flex gap-3">
+             <i class="fa-solid fa-clipboard-check mt-1"></i>
+             <div>
+                 <strong class="d-block mb-1">{{ ot_attente_validation }} OT à valider</strong>
+                 <a href="{% url 'conventionnement:liste_fiches' %}" class="text-decoration-none small text-warning-emphasis fw-bold">Traiter maintenant →</a>
+             </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if bl_attente_validation > 0 %}
+        <div class="alert alert-info border-0 shadow-sm mb-3">
+          <div class="d-flex gap-3">
+             <i class="fa-solid fa-truck-ramp-box mt-1"></i>
+             <div>
+                 <strong class="d-block mb-1">{{ bl_attente_validation }} BL à valider</strong>
+                 <a href="{% url 'conventionnement:liste_fiches' %}" class="text-decoration-none small text-info-emphasis fw-bold">Traiter maintenant →</a>
+             </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if factures_a_valider > 0 %}
+        <div class="alert alert-success border-0 shadow-sm mb-0">
+          <div class="d-flex gap-3">
+             <i class="fa-solid fa-file-invoice-dollar mt-1"></i>
+             <div>
+                 <strong class="d-block mb-1">{{ factures_a_valider }} Factures à valider</strong>
+                 <a href="{% url 'conventionnement:liste_fiches' %}" class="text-decoration-none small text-success-emphasis fw-bold">Traiter maintenant →</a>
+             </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if not ot_attente_validation and not bl_attente_validation and not factures_a_valider %}
+        <div class="text-center text-muted py-3">
+          <div class="kpi-icon kpi-icon-success mx-auto mb-3" style="width:48px;height:48px;font-size:1.2rem;">
+            <i class="fa-solid fa-check"></i>
+          </div>
+          Aucune tâche en attente.<br>Tout est à jour !
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

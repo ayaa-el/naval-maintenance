@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block titre %}Tableau de Bord - Technicien Haddoun{% endblock %}
+{% block contenu %}
+<div class="mb-4">
+  <h3 class="section-title"><i class="fa-solid fa-hammer text-warning"></i> Tableau de Bord — Technicien Haddoun</h3>
+  <p class="text-muted">Bienvenue, {{ user.get_full_name|default:user.username }}. Voici les ordres de travail validés prêts pour intervention.</p>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm bg-warning bg-opacity-10">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="fs-1 text-warning"><i class="fa-solid fa-clipboard-check"></i></div>
+        <div>
+          <div class="fw-bold fs-4">{{ ot_valides_count }}</div>
+          <div class="text-muted">Ordres validés à réaliser</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm bg-success bg-opacity-10">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="fs-1 text-success"><i class="fa-solid fa-circle-check"></i></div>
+        <div>
+          <div class="fw-bold fs-4">{{ ot_termines }}</div>
+          <div class="text-muted">Interventions réalisées</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white py-3">
+    <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-check text-warning me-2"></i> Ordres de Travail Validés par l'ANP</h5>
+  </div>
+  <div class="card-body p-0">
+    {% if ot_valides %}
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>N° OT</th>
+          <th>Équipement / Navire</th>
+          <th>Date Création</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ot in ot_valides %}
+        <tr>
+          <td class="fw-bold">{{ ot.numero_ordre }}</td>
+          <td>{{ ot.fiche_intervention.cible_label }}</td>
+          <td>{{ ot.fiche_intervention.date_creation|date:"d/m/Y" }}</td>
+          <td><span class="badge bg-success">{{ ot.get_status_display }}</span></td>
+          <td>
+            <a href="{% url 'conventionnement:detail_ordre' ot.id %}" class="btn btn-sm btn-outline-primary me-1">
+              <i class="fa-solid fa-eye"></i> Voir
+            </a>
+            <a href="{% url 'conventionnement:realiser_intervention' ot.id %}" class="btn btn-sm btn-warning">
+              <i class="fa-solid fa-hammer"></i> Réaliser
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="text-center text-muted py-5">
+      <i class="fa-solid fa-inbox fa-2x mb-3 d-block"></i>
+      Aucun ordre de travail validé pour le moment.
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

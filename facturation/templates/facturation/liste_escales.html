@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block titre %}Liste des escales{% endblock %}
+
+{% block contenu %}
+<h2>Escales en cours et passées</h2>
+
+<table class="table table-bordered bg-white">
+    <thead style="background-color:#EAF1FB;">
+        <tr>
+            <th>Navire</th>
+            <th>Ouvrage</th>
+            <th>Date d'entrée</th>
+            <th>Montant</th>
+            <th>Statut</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for escale in escales %}
+        <tr>
+            <td>{{ escale.navire.nom_navire }}</td>
+            <td>{{ escale.ouvrage.nom_ouvrage }}</td>
+            <td>{{ escale.date_entree }}</td>
+            <td>{{ escale.montant_total_facture }} MAD</td>
+            <td>
+                {% if escale.statut_facture == "PAYE" %}
+                    <span class="badge bg-success">Payé</span>
+                {% else %}
+                    <span class="badge bg-danger">Non Payé</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if escale.statut_facture != "PAYE" %}
+                <form method="post" action="{% url 'facturation:valider_paiement' escale.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-primary">Valider le paiement</button>
+                </form>
+                {% else %}
+                    <span class="text-success">✓ Sortie autorisée</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

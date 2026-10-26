@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block titre %}Tableau de Bord Général — Direction Portuaire{% endblock %}
+
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="section-title"><i class="fa-solid fa-chart-line text-primary"></i> Espace Direction — Vue Globale du Système</h3>
+        <p class="text-muted mb-0">Synthèse consolidée ANP (Équipements) et HADDOUN (Navires & Facturation).</p>
+    </div>
+    <div>
+        <a href="{% url 'facturation:exporter_excel' %}" class="btn btn-success shadow-sm" id="lien-export-excel">
+            <i class="fa-solid fa-file-excel me-1"></i> Exporter en Excel
+        </a>
+    </div>
+</div>
+
+<!-- Global KPIs -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+        <div class="card card-kpi p-3 border-start border-4 border-primary">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold">CA Total Encaisse</div>
+                    <div class="h4 fw-bold mb-0 text-primary">{{ ca_total }} MAD</div>
+                </div>
+                <div class="kpi-icon kpi-icon-ocean">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card card-kpi p-3 border-start border-4 border-danger">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold">Montant en Attente</div>
+                    <div class="h4 fw-bold mb-0 text-danger">{{ montant_en_attente }} MAD</div>
+                </div>
+                <div class="kpi-icon kpi-icon-danger">
+                    <i class="fa-solid fa-clock-history"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card card-kpi p-3 border-start border-4 border-info">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold">Navires & Escales</div>
+                    <div class="h4 fw-bold mb-0 text-dark">{{ nombre_navires }} <small class="fs-6 text-muted">({{ nombre_escales_total }} esc.)</small></div>
+                </div>
+                <div class="kpi-icon kpi-icon-ocean">
+                    <i class="fa-solid fa-ship"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card card-kpi p-3 border-start border-4 border-success">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="text-muted small fw-semibold">Équipements ANP</div>
+                    <div class="h4 fw-bold mb-0 text-dark">{{ total_equipements }} <small class="fs-6 text-success">({{ equipements_en_service }} ok)</small></div>
+                </div>
+                <div class="kpi-icon kpi-icon-success">
+                    <i class="fa-solid fa-gears"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section ANP & HADDOUN Side-by-Side Summary -->
+<div class="row g-4 mb-4">
+    <!-- ANP Summary Card -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-building-flag me-2"></i> Activité ANP (Équipements)</h5>
+                <span class="badge role-anp">Espace ANP</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 text-center">
+                    <div class="col-4">
+                        <div class="p-2 bg-light rounded">
+                            <span class="d-block small text-muted">En service</span>
+                            <span class="h5 fw-bold text-success">{{ equipements_en_service }}</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 bg-light rounded">
+                            <span class="d-block small text-muted">En réparation</span>
+                            <span class="h5 fw-bold text-warning">{{ equipements_en_reparation }}</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 bg-light rounded">
+                            <span class="d-block small text-muted">Hors service</span>
+                            <span class="h5 fw-bold text-danger">{{ equipements_hors_service }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HADDOUN Summary Card -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-anchor me-2"></i> Activité HADDOUN (Chantier Naval)</h5>
+                <span class="badge role-haddoun">Espace Haddoun</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 text-center">
+                    <div class="col-4">
+                        <div class="p-2 bg-light rounded">
+                            <span class="d-block small text-muted">Fiches créées</span>
+                            <span class="h5 fw-bold text-dark">{{ total_fiches }}</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 bg-light rounded">
+                            <span class="d-block small text-muted">Ordres de travail</span>
+                            <span class="h5 fw-bold text-info">{{ fiches_avec_ordre }}</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 bg-light rounded">
+                            <span class="d-block small text-muted">OT Verrouillés</span>
+                            <span class="h5 fw-bold text-secondary">{{ ot_verrouilles }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 fw-bold"><i class="fa-solid fa-chart-column me-2 text-primary"></i> Escales par Ouvrage</div>
+            <div class="card-body">
+                <canvas id="graphOuvrages" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 fw-bold"><i class="fa-solid fa-chart-pie me-2 text-primary"></i> Répartition du Chiffre d'Affaires</div>
+            <div class="card-body">
+                <canvas id="graphCA" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Employees Section -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 fw-bold"><i class="fa-solid fa-trophy me-2 text-warning"></i> Top 5 Intervenants / Employés (Heures Réalisées)</div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Employé / Technicien</th>
+                            <th>Métier</th>
+                            <th>Total Heures Intervenues</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for emp in top_employes %}
+                        <tr>
+                            <td class="fw-bold"><i class="fa-solid fa-user-gear me-2 text-muted"></i> {{ emp.employe__prenom }} {{ emp.employe__nom }}</td>
+                            <td><span class="badge bg-secondary opacity-75">Intervenant</span></td>
+                            <td class="fw-bold text-primary">{{ emp.total_heures }} heures</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-3">Aucune tâche enregistrée pour le moment.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ escales_par_ouvrage|json_script:"data-ouvrages" }}
+{{ ca_par_ouvrage|json_script:"data-ca" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const donneesOuvrages = JSON.parse(document.getElementById('data-ouvrages').textContent);
+    const donneesCA = JSON.parse(document.getElementById('data-ca').textContent);
+
+    if (document.getElementById('graphOuvrages')) {
+        new Chart(document.getElementById('graphOuvrages'), {
+            type: 'bar',
+            data: {
+                labels: donneesOuvrages.map(o => o.ouvrage__nom_ouvrage),
+                datasets: [{
+                    label: "Nombre d'escales",
+                    data: donneesOuvrages.map(o => o.nombre),
+                    backgroundColor: "#0077B6",
+                    borderRadius: 6
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+        });
+    }
+
+    if (document.getElementById('graphCA')) {
+        new Chart(document.getElementById('graphCA'), {
+            type: 'doughnut',
+            data: {
+                labels: donneesCA.map(o => o.ouvrage__nom_ouvrage),
+                datasets: [{
+                    data: donneesCA.map(o => o.total),
+                    backgroundColor: ["#0B192C", "#0077B6", "#00B4D8", "#90E0EF"]
+                }]
+            },
+            options: { responsive: true }
+        });
+    }
+
+    const exportBtn = document.getElementById('lien-export-excel');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', function (e) {
+            if (window.pywebview && window.pywebview.api) {
+                e.preventDefault();
+                window.pywebview.api.ouvrir_dans_navigateur(this.href);
+            }
+        });
+    }
+</script>
+{% endblock %}

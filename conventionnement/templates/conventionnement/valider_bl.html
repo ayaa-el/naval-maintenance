@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block titre %}Validation du Bon de Livraison {{ bon.numero_bon }}{% endblock %}
+
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="section-title text-dark">
+      <i class="fa-solid fa-stamp text-ocean me-2"></i> Examen & Validation du Bon de Livraison
+    </h3>
+    <p class="text-muted mb-0">Rôle requis : <strong>Superviseur ANP</strong> · Document : <span class="fw-bold text-primary">{{ bon.numero_bon }}</span></p>
+  </div>
+  <a href="{% url 'conventionnement:detail_ordre' ordre.id %}" class="btn btn-outline-secondary">
+    <i class="fa-solid fa-arrow-left me-1"></i> Retour à l'OT
+  </a>
+</div>
+
+<div class="row g-4">
+  <!-- Colonne Gauche : Récapitulatif des Travaux à Valider -->
+  <div class="col-lg-7">
+    <div class="premium-card mb-4">
+      <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-dark">
+          <i class="fa-solid fa-file-invoice text-primary me-2"></i> Détail des Prestations Livrées
+        </h5>
+        <span class="badge bg-warning text-dark">{{ bon.get_statut_display }}</span>
+      </div>
+      <div class="card-body">
+        <dl class="row mb-3 pb-3 border-bottom">
+          <dt class="col-sm-4 text-muted">Fiche Intervention</dt>
+          <dd class="col-sm-8 fw-semibold">
+            <a href="{% url 'conventionnement:detail_fiche' ordre.fiche_intervention.id %}">{{ ordre.fiche_intervention.numero_fiche }}</a>
+          </dd>
+          <dt class="col-sm-4 text-muted">Ordre de Travail</dt>
+          <dd class="col-sm-8 fw-semibold">
+            <a href="{% url 'conventionnement:detail_ordre' ordre.id %}">{{ ordre.numero_ordre }}</a>
+          </dd>
+          <dt class="col-sm-4 text-muted">Cible</dt>
+          <dd class="col-sm-8 fw-bold text-dark">{{ ordre.fiche_intervention.cible_label }}</dd>
+          <dt class="col-sm-4 text-muted">Date du BL</dt>
+          <dd class="col-sm-8">{{ bon.date_creation|date:"d/m/Y" }}</dd>
+          {% if bon.commentaire %}
+          <dt class="col-sm-4 text-muted">Note Haddoun</dt>
+          <dd class="col-sm-8 text-secondary fst-italic">{{ bon.commentaire }}</dd>
+          {% endif %}
+        </dl>
+
+        <!-- Tableau des lignes et prix -->
+        <h6 class="fw-bold text-dark mb-2"><i class="fa-solid fa-list-check text-muted me-1"></i> Prestations & Pièces facturables :</h6>
+        <div class="table-responsive border rounded mb-3">
+          <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Désignation</th>
+                <th class="text-center">Quantité</th>
+                <th class="text-end">Prix Unitaire</th>
+                <th class="text-end">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ligne in ordre.lignes.all %}
+              <tr>
+                <td>{{ ligne.description }}</td>
+                <td class="text-center">{{ ligne.quantite }}</td>
+                <td class="text-end text-muted">{{ ligne.prix_unitaire }} MAD</td>
+                <td class="text-end fw-bold">{{ ligne.montant }} MAD</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-2">Aucune ligne spécifiée.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+              <tr>
+                <td colspan="3" class="text-end fw-bold text-uppercase">Total H.T. à Approuver :</td>
+                <td class="text-end fw-bold text-success fs-6">{{ ordre.montant_total }} MAD</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="alert alert-info border-0 py-2 px-3 small d-flex align-items-center gap-2">
+          <i class="fa-solid fa-circle-info fa-lg"></i>
+          <div>
+            La validation conforme de ce Bon de Livraison permettra à la société prestataire d'émettre la facture correspondante.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colonne Droite : Décision du Superviseur ANP -->
+  <div class="col-lg-5">
+    <div class="premium-card">
+      <div class="card-header bg-white py-3 border-bottom">
+        <h5 class="fw-bold mb-0 text-dark">
+          <i class="fa-solid fa-gavel text-ocean me-2"></i> Décision de Validation (ANP)
+        </h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Décision du Superviseur</label>
+            <div class="d-grid gap-2">
+              {% for radio in form.status %}
+              <label class="border rounded p-3 d-flex align-items-center gap-3 cursor-pointer bg-light hover-shadow">
+                {{ radio.tag }}
+                <div>
+                  <span class="fw-bold">{{ radio.choice_label }}</span>
+                </div>
+              </label>
+              {% endfor %}
+            </div>
+            {% if form.status.errors %}
+            <div class="text-danger small mt-1">{{ form.status.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold" for="{{ form.commentaire.id_for_label }}">
+              {{ form.commentaire.label }} <span class="text-muted small fw-normal">(obligatoire si refusé)</span>
+            </label>
+            {{ form.commentaire }}
+            {% if form.commentaire.errors %}
+            <div class="text-danger small mt-1">{{ form.commentaire.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="d-grid gap-2 pt-2">
+            <button type="submit" class="btn btn-primary-maritime py-2 fw-semibold">
+              <i class="fa-solid fa-check-circle me-1"></i> Enregistrer la Décision
+            </button>
+            <a href="{% url 'conventionnement:detail_ordre' ordre.id %}" class="btn btn-outline-secondary py-2">
+              Annuler
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

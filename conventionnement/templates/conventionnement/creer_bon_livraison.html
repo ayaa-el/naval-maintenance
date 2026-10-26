@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block titre %}Créer le Bon de Livraison{% endblock %}
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="section-title"><i class="fa-solid fa-file-invoice text-info"></i> Créer le Bon de Livraison</h3>
+    <p class="text-muted mb-0">Pour l'Ordre de Travail : <strong>{{ ordre.numero_ordre }}</strong></p>
+  </div>
+  <a href="{% url 'conventionnement:detail_ordre' ordre.id %}" class="btn btn-outline-secondary">
+    <i class="fa-solid fa-arrow-left me-1"></i> Retour
+  </a>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white py-3">
+        <h5 class="fw-bold mb-0"><i class="fa-solid fa-pen text-info me-2"></i> Informations du Bon de Livraison & Saisie des Prix</h5>
+      </div>
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          {{ formset.non_form_errors }}
+          
+          <h6 class="fw-bold text-primary mb-3"><i class="fa-solid fa-calculator me-1"></i> Tarification des services réalisés</h6>
+          <p class="text-muted small">Veuillez renseigner le prix unitaire pour chaque prestation fournie :</p>
+          
+          {{ formset.management_form }}
+          <div class="table-responsive mb-4">
+            <table class="table align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Description</th>
+                  <th class="text-center" style="width: 20%;">Quantité / Heures</th>
+                  <th class="text-end" style="width: 30%;">Prix Unitaire (MAD)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for form_item in formset %}
+                <tr>
+                  {{ form_item.id }}
+                  <td>
+                    {{ form_item.description }}
+                    {% for error in form_item.description.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {{ form_item.quantite }}
+                    {% for error in form_item.quantite.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                  </td>
+                  <td>
+                    {{ form_item.prix_unitaire }}
+                    {% for error in form_item.prix_unitaire.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">{{ form.commentaire.label }}</label>
+            {{ form.commentaire }}
+            {% for error in form.commentaire.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            <div class="form-text">Ajoutez des précisions sur les travaux livrés, les conditions, ou toute remarque utile.</div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-info text-white btn-lg">
+              <i class="fa-solid fa-file-circle-plus me-2"></i> Créer le Bon de Livraison
+            </button>
+            <a href="{% url 'conventionnement:detail_ordre' ordre.id %}" class="btn btn-outline-secondary btn-lg">Annuler</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

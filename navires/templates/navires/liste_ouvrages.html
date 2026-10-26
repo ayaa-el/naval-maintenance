@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block titre %}Ouvrages{% endblock %}
+
+{% block contenu %}
+<h4 class="text-muted mb-4">Plan d'occupation des ouvrages</h4>
+
+<div class="row">
+    {% for item in donnees %}
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-header" style="background-color:#1F3864;color:white;">
+                <strong>{{ item.ouvrage.nom_ouvrage }}</strong>
+            </div>
+            <div class="card-body">
+                <p class="mb-1">Tarif journalier : {{ item.ouvrage.prix_fixe_journalier }} MAD</p>
+                {% if item.escales %}
+                    {% for escale in item.escales %}
+                        <span class="badge bg-danger">Occupé</span>
+                        <p class="mt-2 mb-0">{{ escale.navire.nom_navire }}</p>
+                        <small class="text-muted">Entrée le {{ escale.date_entree }}</small>
+                    {% endfor %}
+                {% else %}
+                    <span class="badge bg-success">Libre</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

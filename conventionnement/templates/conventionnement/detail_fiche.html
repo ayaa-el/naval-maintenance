@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block titre_page %}Fiche {{ fiche.numero_fiche }}{% endblock %}
+
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="section-title text-dark"><i class="fa-solid fa-file-invoice text-ocean me-2"></i> Fiche d'Intervention : <span class="text-primary">{{ fiche.numero_fiche }}</span></h3>
+        <p class="text-muted mb-0">Créée le <span class="fw-semibold">{{ fiche.date_creation|date:"d M Y" }}</span> par {{ fiche.cree_par|default:"Système" }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'conventionnement:imprimer_fiche' fiche.id %}" target="_blank" class="btn btn-warning text-dark fw-semibold shadow-sm">
+            <i class="fa-solid fa-print me-1"></i> Imprimer la Fiche
+        </a>
+        {% if user.role == "SUPERVISEUR_ANP" and not fiche.ordre_travail %}
+        <a href="{% url 'conventionnement:modifier_fiche' fiche.id %}" class="btn btn-outline-warning text-dark">
+            <i class="fa-solid fa-pen me-1"></i> Modifier
+        </a>
+        <a href="{% url 'conventionnement:supprimer_fiche' fiche.id %}" class="btn btn-outline-danger">
+            <i class="fa-solid fa-trash me-1"></i> Supprimer
+        </a>
+        {% endif %}
+        <a href="{% url 'conventionnement:liste_fiches' %}" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i> Retour aux dossiers
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="premium-card mb-4 h-100">
+            <div class="card-header border-bottom-0 bg-white py-3">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-circle-info text-ocean me-2"></i> Informations Générales</h5>
+            </div>
+            <div class="card-body pt-0">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted py-2 border-bottom">Type de Fiche</dt>
+                    <dd class="col-sm-8 py-2 border-bottom mb-0">
+                        {% if fiche.is_navire %}
+                            <span class="badge-premium badge-info"><i class="fa-solid fa-ship me-1"></i> Workflow Navire (Haddoun)</span>
+                        {% else %}
+                            <span class="badge-premium badge-warning"><i class="fa-solid fa-truck-ramp-box me-1"></i> Workflow Équipement (ANP)</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4 text-muted py-2 border-bottom">Équipement / Navire Cible</dt>
+                    <dd class="col-sm-8 fw-bold text-dark py-2 border-bottom mb-0">{{ fiche.cible_label }}</dd>
+
+                    <dt class="col-sm-4 text-muted py-2 border-bottom">Problème Déclaré (ANP)</dt>
+                    <dd class="col-sm-8 text-secondary py-2 border-bottom mb-0">{{ fiche.description_probleme }}</dd>
+
+                    <dt class="col-sm-4 text-muted py-2">Diagnostic Technique (Haddoun)</dt>
+                    <dd class="col-sm-8 py-2 mb-0">
+                        {% if fiche.precision_probleme %}
+                            <div class="p-3 bg-light rounded text-dark border-start border-4 border-ocean shadow-sm">
+                                <i class="fa-solid fa-quote-left text-muted opacity-50 me-2"></i>{{ fiche.precision_probleme }}
+                                <div class="small text-muted mt-2 d-flex align-items-center">
+                                    <i class="fa-solid fa-user-gear me-1"></i> Renseigné par : <span class="fw-semibold ms-1">{{ fiche.traite_par|default:"Technicien Haddoun" }}</span>
+                                </div>
+                            </div>
+                        {% else %}
+                            <span class="text-muted fst-italic"><i class="fa-solid fa-clock-rotate-left me-1"></i> Non encore renseigné par Haddoun.</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Side: Workflow Status & Actions -->
+    <div class="col-lg-4">
+        <div class="premium-card h-100">
+            <div class="card-header border-bottom-0 bg-white py-3">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-sliders text-ocean me-2"></i> État du Workflow</h5>
+            </div>
+            <div class="card-body pt-0">
+                {% if fiche.ordre_travail %}
+                    <div class="alert alert-success d-flex align-items-center gap-3 mb-4 shadow-sm border-0 bg-success bg-opacity-10 text-success-emphasis">
+                        <i class="fa-solid fa-circle-check fa-2x"></i>
+                        <div>
+                            <strong class="d-block mb-1">Ordre de Travail Généré</strong>
+                            <div class="small opacity-75">{{ fiche.ordre_travail.numero_ordre }}</div>
+                        </div>
+                    </div>
+                    <a href="{% url 'conventionnement:detail_ordre' fiche.ordre_travail.id %}" class="btn btn-primary-maritime w-100 mb-2 py-2">
+                        <i class="fa-solid fa-eye me-2"></i> Consulter l'Ordre de Travail
+                    </a>
+                {% else %}
+                    <div class="alert alert-warning d-flex align-items-center gap-3 mb-4 shadow-sm border-0 bg-warning bg-opacity-10 text-warning-emphasis">
+                        <i class="fa-solid fa-hourglass-half fa-2x"></i>
+                        <div>
+                            <strong class="d-block mb-1">En attente d'OT</strong>
+                            <div class="small opacity-75">L'intervention n'a pas encore été ordonnancée.</div>
+                        </div>
+                    </div>
+                    {% if not fiche.ordre_travail %}
+                        {% if user.role == "TECHNICIEN_HADDOUN" or user.role == "CHEF_EQUIPE" %}
+                            {% if not fiche.precision_probleme %}
+                            <a href="{% url 'conventionnement:ajouter_diagnostic' fiche.id %}" class="btn btn-warning w-100 text-dark mb-2 fw-semibold py-2">
+                                <i class="fa-solid fa-stethoscope me-2"></i> Ajouter le Diagnostic
+                            </a>
+                            {% else %}
+                            <a href="{% url 'conventionnement:creer_ordre_travail' fiche.id %}" class="btn btn-primary-maritime w-100 mb-2 py-2">
+                                <i class="fa-solid fa-plus me-2"></i> Créer l'Ordre de Travail
+                            </a>
+                            {% endif %}
+                        {% endif %}
+                        {% if user.role == "SUPERVISEUR_ANP" %}
+                            {% if not fiche.precision_probleme %}
+                            <div class="alert alert-warning border-0 py-2 px-3 small">
+                                <i class="fa-solid fa-clock me-1"></i> En attente du diagnostic Haddoun...
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titre %}Supprimer ce pointage{% endblock %}
+{% block contenu %}
+<div class="row justify-content-center mt-5">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm border-danger border-top border-3">
+      <div class="card-body text-center p-5">
+        <i class="fa-solid fa-trash text-danger fa-3x mb-3"></i>
+        <h4 class="fw-bold">Supprimer ce pointage ?</h4>
+        <div class="alert alert-secondary text-start small mb-4">
+          <dl class="row mb-0">
+            <dt class="col-5">Employé :</dt><dd class="col-7">{{ tache.employe }}</dd>
+            <dt class="col-5">Date :</dt><dd class="col-7">{{ tache.date_tache|date:"d/m/Y" }}</dd>
+            <dt class="col-5">Durée :</dt><dd class="col-7">{{ tache.duree_heures }}h</dd>
+            <dt class="col-5">Description :</dt><dd class="col-7">{{ tache.description_travail|truncatechars:60 }}</dd>
+          </dl>
+        </div>
+        <form method="post" class="d-flex justify-content-center gap-3">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-lg">
+            <i class="fa-solid fa-trash me-2"></i> Confirmer la suppression
+          </button>
+          <a href="{% url 'rh:liste_taches' %}" class="btn btn-outline-secondary btn-lg">Annuler</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

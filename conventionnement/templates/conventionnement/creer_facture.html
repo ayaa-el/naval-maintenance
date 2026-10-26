@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block titre %}Créer la Facture{% endblock %}
+{% block contenu %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h3 class="section-title"><i class="fa-solid fa-file-invoice-dollar text-success"></i> Créer la Facture</h3>
+    <p class="text-muted mb-0">Pour le Bon de Livraison : <strong>{{ bon.numero_bon }}</strong> — OT : <strong>{{ ordre.numero_ordre }}</strong></p>
+  </div>
+  <a href="{% url 'conventionnement:detail_ordre' ordre.id %}" class="btn btn-outline-secondary">
+    <i class="fa-solid fa-arrow-left me-1"></i> Retour
+  </a>
+</div>
+
+{# Récapitulatif OT #}
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-header bg-white py-3">
+    <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-check text-primary me-2"></i> Récapitulatif des Services</h5>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Description</th>
+          <th class="text-center">Quantité</th>
+          <th class="text-end">Prix Unitaire (MAD)</th>
+          <th class="text-end fw-bold">Montant (MAD)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ligne in ordre.lignes.all %}
+        <tr>
+          <td>{{ ligne.description }}</td>
+          <td class="text-center">{{ ligne.quantite }}</td>
+          <td class="text-end">{{ ligne.prix_unitaire }}</td>
+          <td class="text-end fw-bold text-success">{{ ligne.montant|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="table-light">
+        <tr>
+          <td colspan="3" class="text-end fw-bold">Total :</td>
+          <td class="text-end fw-bold text-success fs-5">{{ ordre.montant_total }} MAD</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white py-3">
+        <h5 class="fw-bold mb-0"><i class="fa-solid fa-pen text-success me-2"></i> Informations de la Facture</h5>
+      </div>
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">{{ form.montant_total.label }}</label>
+            {{ form.montant_total }}
+            {% for error in form.montant_total.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            <div class="form-text">Modifiez si nécessaire. Par défaut, reprend le montant de l'OT.</div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">{{ form.condition_paiement.label }}</label>
+            <div class="d-flex flex-column gap-2">
+              {% for choice in form.condition_paiement %}
+              <div class="form-check">
+                {{ choice.tag }}
+                <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="alert alert-info">
+            <i class="fa-solid fa-circle-info me-2"></i>
+            Cette facture sera envoyée au Superviseur ANP pour validation finale. Après validation, l'OT sera verrouillé.
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success btn-lg">
+              <i class="fa-solid fa-file-invoice-dollar me-2"></i> Créer la Facture
+            </button>
+            <a href="{% url 'conventionnement:detail_ordre' ordre.id %}" class="btn btn-outline-secondary btn-lg">Annuler</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
